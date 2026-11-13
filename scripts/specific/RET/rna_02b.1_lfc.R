@@ -205,7 +205,7 @@ p_hist_comb <- ggplot(lfc_combined, aes(LFC_Unt_vs_Rest)) +
   geom_histogram(bins = 80, fill = "#74b9ff", color = "white", linewidth = 0.2) +
   geom_vline(xintercept = c(-LOGFC_THRESHOLD, LOGFC_THRESHOLD),
              linetype = "dashed", color = "#e17055") +
-  labs(title = paste("LFC distribution — Untreated vs Resto (conjunta) —", OUT_PREFIX),
+  labs(title = paste("LFC distribution — Untreated vs Rest (joint) —", OUT_PREFIX),
        x = "log2 Fold Change", y = "Genes") +
   theme_minimal(base_size = 12) +
   theme(plot.title = element_text(face = "bold"),
@@ -312,7 +312,7 @@ if (length(sig_genes) >= 3) {
            show_colnames     = TRUE,
            fontsize_row      = 8,
            fontsize_col      = 9,
-           main = paste0("Firma conjunta — top ", length(sig_up), " up / ",
+           main = paste0("Joint signature — top ", length(sig_up), " up / ",
                          length(sig_down), " down — ", OUT_PREFIX),
            silent = TRUE)
 
@@ -328,27 +328,27 @@ if (length(sig_genes) >= 3) {
 cat("8. Generating report...\n")
 
 report_text <- paste0(
-  "# LFC Report (parental tratada) — ", OUT_PREFIX, "\n\n",
-  "**Fármacos:** ", paste(drugs, collapse = ", "), "\n",
+  "# LFC Report (treated parental) — ", OUT_PREFIX, "\n\n",
+  "**Drugs:** ", paste(drugs, collapse = ", "), "\n",
   "**Threshold:** |LFC| ≥ ", LOGFC_THRESHOLD, "\n\n",
-  "## Comparaciones por fármaco\n",
-  "- b) Untreated vs Treated — respuesta aguda al fármaco\n",
-  "- c) Treated vs Resistance — cambio adicional al llegar a resistencia\n",
-  "- d) Untreated vs Resistance — cambio total\n\n",
-  "## Comparación conjunta (a)\n",
-  "Untreated vs Resto (media 50/50 de Treated_comb y Resistant_comb, cada fármaco pesando igual)\n",
+  "## Comparisons per drug\n",
+  "- b) Untreated vs Treated — acute response to the drug\n",
+  "- c) Treated vs Resistance — additional change on reaching resistance\n",
+  "- d) Untreated vs Resistance — total change\n\n",
+  "## Joint comparison (a)\n",
+  "Untreated vs Rest (50/50 mean of Treated_comb and Resistant_comb, each drug weighted equally)\n",
   "- Upregulated: ", tab_comb["Upregulated"], "\n",
   "- Downregulated: ", tab_comb["Downregulated"], "\n",
   "- Other: ", tab_comb["Other"], "\n\n",
-  "## Tablas\n",
-  "- 02b_lfc_by_drug.csv (", nrow(lfc_by_drug), " filas)\n",
-  "- 02b_lfc_combined.csv (", nrow(lfc_combined), " filas)\n\n",
-  "## Figuras\n",
+  "## Tables\n",
+  "- 02b_lfc_by_drug.csv (", nrow(lfc_by_drug), " rows)\n",
+  "- 02b_lfc_combined.csv (", nrow(lfc_combined), " rows)\n\n",
+  "## Figures\n",
   paste(paste0("- 02b_lfc_histogram_", drugs, ".png\n"), collapse = ""),
   "- 02b_lfc_histogram_combined.png\n",
   paste(paste0("- 02b_venn_up_", drugs, ".png\n"), collapse = ""),
   paste(paste0("- 02b_venn_down_", drugs, ".png\n"), collapse = ""),
-  "- 02b_heatmap_classified.png (colores por defecto de pheatmap)\n"
+  "- 02b_heatmap_classified.png (default pheatmap colors)\n"
 )
 writeLines(report_text, file.path(RESULTS_DIR, "report", "02b_lfc_report.md"))
 cat("  Report: report/02b_lfc_report.md\n\n")

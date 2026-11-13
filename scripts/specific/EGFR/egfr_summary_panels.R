@@ -43,9 +43,8 @@
 #   tables (enrichKEGG is not repeated). If they are missing, the panel is
 #   skipped with a console warning.
 #
-# Axes, titles and subtitles in English; colour legend (title + categories) in
-# Spanish: Clasificacion/Direccion (Sobreexpresado/Infraexpresado/Otro),
-# p ajustado. Z-score/log2CPM/Genes are not translated.
+# Axes, titles, subtitles and colour legends (title + categories) in English:
+# Classification/Direction (Upregulated/Downregulated/Other), adjusted p-value.
 #
 # Inputs (results/EGFR/EGFR1/tables/):
 #   01_mat_tmm.csv, 01_metadata_unit.csv          (rna_01.1_qc.R)
@@ -164,14 +163,14 @@ mat <- mat[, rownames(metadata_unit), drop = FALSE]
 annotation <- metadata_unit[, !colnames(metadata_unit) %in% c("Sample", "Model", "Cell_Line"), drop = FALSE]
 ann_colors <- filter_annotation_colors(annotation)
 
-# Local Spanish translation of the pheatmap annotation legend --
+# Local recoding of the pheatmap annotation legend (identity mapping, kept so the lookup logic stays in place) --
 # Treatment/Condition and their values (Yes/No/Parental/Resistance) come from
 # 01_metadata_unit.csv and from the global `annotation_colors` list in
 # config/colors.R, SHARED with MET/RET/ALK -- it is translated only here
 # (columns + values + ann_colors of this script), without touching colors.R,
 # so the other pipelines that already use those English names are unaffected.
-VALORES_ANOT_ES  <- c(Yes = "Sí", No = "No", Parental = "Parental", Resistance = "Resistencia")
-COLUMNAS_ANOT_ES <- c(Treatment = "Tratamiento", Condition = "Condición")
+VALORES_ANOT_ES  <- c(Yes = "Yes", No = "No", Parental = "Parental", Resistance = "Resistance")
+COLUMNAS_ANOT_ES <- c(Treatment = "Treatment", Condition = "Condition")
 recode_es <- function(x) ifelse(x %in% names(VALORES_ANOT_ES), VALORES_ANOT_ES[x], x)
 
 for (col in intersect(names(ann_colors), colnames(annotation))) {
@@ -219,7 +218,7 @@ ph_top <- pheatmap(plot_mat,
          cluster_cols         = TRUE,
          clustering_method    = "ward.D2",
          main              = paste0("Top ", n_hm, " variable genes — EGFR1 / EGFR1_R",
-                                     if (!usar_zscore) " (log2CPM crudo, n<=2 muestras)" else ""),
+                                     if (!usar_zscore) " (raw log2CPM, n<=2 samples)" else ""),
          silent            = TRUE)
 
 out_a <- file.path(FIG_DIR, "fig3_panelA_heatmap_top500.png")
@@ -278,14 +277,14 @@ p_panelB <- ggplot(plot_df,
   geom_text_repel(aes(label = label), size = 5, fontface = "bold", color = "black",
                   max.overlaps = Inf, segment.size = 0.2, box.padding = 0.5,
                   force = 2, max.iter = 20000, seed = 42) +
-  # Legend in Spanish -- axes/titles in English.
-  scale_color_manual(values = classification_colors, name = "Clasificación",
-                     labels = c(Upregulated = "Sobreexpresado",
-                                Downregulated = "Infraexpresado",
-                                Other = "Otro")) +
+  # Legend, axes and titles in English.
+  scale_color_manual(values = classification_colors, name = "Classification",
+                     labels = c(Upregulated = "Upregulated",
+                                Downregulated = "Downregulated",
+                                Other = "Other")) +
   labs(
     title = "MA plot, EGFR1_R vs EGFR1",
-    subtitle = paste0("|LFC| threshold = ", LOGFC_THRESHOLD, "  |  genes clave: egfr_resistance_core"),
+    subtitle = paste0("|LFC| threshold = ", LOGFC_THRESHOLD, "  |  key genes: egfr_resistance_core"),
     x = "Mean Parental log2CPM",
     y = "LFC Resistance vs Parental"
   ) +
@@ -340,8 +339,8 @@ COLORES_PANEL_C <- c("Upregulated" = "#f2a900", "Downregulated" = "#000000")
 p_panelC <- ggplot(df_c1, aes(x = LFC_Res_vs_Par, y = Gene, fill = Classification)) +
   geom_col(width = 0.7) +
   geom_vline(xintercept = 0, color = "gray40", linewidth = 0.3) +
-  scale_fill_manual(values = COLORES_PANEL_C, name = "Dirección",
-                     labels = c(Upregulated = "Sobreexpresado", Downregulated = "Infraexpresado")) +
+  scale_fill_manual(values = COLORES_PANEL_C, name = "Direction",
+                     labels = c(Upregulated = "Upregulated", Downregulated = "Downregulated")) +
   labs(
     title = "EGFR conservative resistance signature",
     subtitle = paste0("Top 15 Up + top 15 Down by LFC (EGFR_resistance_signature_conservative.csv)",
@@ -390,8 +389,8 @@ p_panelC2 <- ggplot(df_c2, aes(x = LFC_Res_vs_Par, y = Gene, fill = Classificati
   geom_vline(xintercept = 0, color = "gray40", linewidth = 0.3) +
   # Standard project orange/blue (classification_colors), different from the
   # gold/black of Panel C.
-  scale_fill_manual(values = classification_colors[c("Upregulated", "Downregulated")], name = "Dirección",
-                     labels = c(Upregulated = "Sobreexpresado", Downregulated = "Infraexpresado")) +
+  scale_fill_manual(values = classification_colors[c("Upregulated", "Downregulated")], name = "Direction",
+                     labels = c(Upregulated = "Upregulated", Downregulated = "Downregulated")) +
   labs(
     title = "EGFR resistance mechanisms (Pros et al. / Quintanal-Villalonga 2020)",
     subtitle = paste0("n = ", nrow(df_c2), " genes (egfr_resistance_core: SCLC/LuSCC transformation, ",
@@ -456,10 +455,10 @@ if (!file.exists(IN_KEGG_UP)) {
   p_panelD <- ggplot(kegg_top, aes(x = FoldEnrichment, y = Description,
                                     size = Count, fill = p.adjust, shape = Direction)) +
     geom_point(color = "grey20", stroke = 0.3) +
-    scale_shape_manual(values = c(Upregulated = 24, Downregulated = 25), name = "Dirección",
-                       labels = c(Upregulated = "Sobreexpresado", Downregulated = "Infraexpresado")) +
+    scale_shape_manual(values = c(Upregulated = 24, Downregulated = 25), name = "Direction",
+                       labels = c(Upregulated = "Upregulated", Downregulated = "Downregulated")) +
     scale_fill_gradient(low = COLOR_KEGG_SIG, high = COLOR_KEGG_NOSIG, trans = "log10",
-                         name = "p ajustado", guide = guide_colorbar(reverse = TRUE)) +
+                         name = "adjusted p-value", guide = guide_colorbar(reverse = TRUE)) +
     scale_size_continuous(range = c(3, 10), name = "Genes",
                            guide = guide_legend(override.aes = list(shape = 24, fill = "grey40"))) +
     labs(

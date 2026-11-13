@@ -16,8 +16,8 @@
 #
 # Outputs (results/RET/combined/figures/):
 #   RET_08b_fig25_pca_{RET1,RET2}.png              -- with names   
-#   RET_08b_fig25_pca_{RET1,RET2}_sin_nombres.png  -- without names
-#   RET_08b_fig25_panel_combinado_sin_nombres.png   -- PCA without names + heatmaps
+#   RET_08b_fig25_pca_{RET1,RET2}_no_names.png  -- without names
+#   RET_08b_fig25_panel_combined_no_names.png   -- PCA without names + heatmaps
 #
 # Dependencies (run first): scripts/simple/rna_01.1_qc.R with
 # DATASET = "RET1" and DATASET = "RET2".
@@ -41,7 +41,7 @@ dir.create(OUT_DIR, recursive = TRUE, showWarnings = FALSE)
 MODELOS        <- c("RET1", "RET2")
 TOP_N_VARIANZA <- 500
 
-COLOR_CONDICION     <- c(Parental = "#e6a817", Resistente = "#013c58")
+COLOR_CONDICION     <- c(Parental = "#e6a817", Resistant = "#013c58")
 FORMA_INHIBIDOR_PCA <- c(No = 16, BLU667 = 17, LOXO292 = 15)
 COLOR_DRUG          <- c(No = "#95A5A6", BLU667 = "#6C5CE7", LOXO292 = "#00B894")
 
@@ -64,7 +64,7 @@ leer_tmm <- function(modelo) {
 leer_metadata <- function(modelo) {
   meta <- read.csv(here::here("results", "RET", modelo, "tables", "01_metadata_unit.csv"),
                    stringsAsFactors = FALSE)
-  meta$Condition3 <- ifelse(meta$Condition == "Resistance", "Resistente", "Parental")
+  meta$Condition3 <- ifelse(meta$Condition == "Resistance", "Resistant", "Parental")
   meta
 }
 
@@ -102,8 +102,8 @@ construir_pca <- function(sel, modelo) {
 
   p_base <- ggplot(df_pca, aes(x = PC1, y = PC2, color = Condition, shape = Drug)) +
     geom_point(size = 4) +
-    scale_color_manual(values = COLOR_CONDICION, name = "Condición") +
-    scale_shape_manual(values = FORMA_INHIBIDOR_PCA, drop = TRUE, name = "Inhibidor") +
+    scale_color_manual(values = COLOR_CONDICION, name = "Condition") +
+    scale_shape_manual(values = FORMA_INHIBIDOR_PCA, drop = TRUE, name = "Drug") +
     scale_x_continuous(expand = expansion(mult = 0.18)) +
     scale_y_continuous(expand = expansion(mult = 0.18)) +
     coord_cartesian(clip = "off") +
@@ -134,9 +134,9 @@ construir_pca <- function(sel, modelo) {
 #    legend because in the combined figure it is shared at the bottom) ───────
 construir_heatmap <- function(sel, modelo) {
   ann_col <- HeatmapAnnotation(
-    `Condición` = setNames(sel$meta_ord$Condition3, colnames(sel$mat_z)),
-    Inhibidor   = setNames(sel$meta_ord$Drug, colnames(sel$mat_z)),
-    col = list(`Condición` = COLOR_CONDICION, Inhibidor = COLOR_DRUG),
+    Condition = setNames(sel$meta_ord$Condition3, colnames(sel$mat_z)),
+    Drug        = setNames(sel$meta_ord$Drug, colnames(sel$mat_z)),
+    col = list(Condition = COLOR_CONDICION, Drug = COLOR_DRUG),
     show_annotation_name = FALSE,
     show_legend = FALSE,
     simple_anno_size = unit(3, "mm")
@@ -168,7 +168,7 @@ for (modelo in MODELOS) {
   heatmaps[[modelo]]      <- construir_heatmap(sel, modelo)
 
   out_con <- file.path(OUT_DIR, paste0("RET_08b_fig25_pca_", modelo, ".png"))
-  out_sin <- file.path(OUT_DIR, paste0("RET_08b_fig25_pca_", modelo, "_sin_nombres.png"))
+  out_sin <- file.path(OUT_DIR, paste0("RET_08b_fig25_pca_", modelo, "_no_names.png"))
   ggsave(out_con, p$con, width = 7, height = 6.5, dpi = 300)
   ggsave(out_sin, p$sin, width = 7, height = 6.5, dpi = 300)
   cat("  ", out_con, "\n  ", out_sin, "\n")
@@ -180,13 +180,13 @@ leyenda_compartida <- packLegend(
   Legend(col_fun = COL_FUN_RNA, title = "Z-score (TMM per gene)", direction = "horizontal",
          legend_width = unit(4, "cm")),
   Legend(labels = names(COLOR_CONDICION), legend_gp = gpar(fill = COLOR_CONDICION),
-         title = "Condición", direction = "horizontal"),
+         title = "Condition", direction = "horizontal"),
   Legend(labels = names(COLOR_DRUG), legend_gp = gpar(fill = COLOR_DRUG),
-         title = "Inhibidor", direction = "horizontal"),
+         title = "Drug", direction = "horizontal"),
   direction = "horizontal"
 )
 
-out_combinado <- file.path(OUT_DIR, "RET_08b_fig25_panel_combinado_sin_nombres.png")
+out_combinado <- file.path(OUT_DIR, "RET_08b_fig25_panel_combined_no_names.png")
 png(out_combinado, width = 2 * ANCHO_HEATMAP, height = ALTO_PCA + ALTO_HEATMAP + 1.5,
     units = "in", res = 300)
 grid.newpage()

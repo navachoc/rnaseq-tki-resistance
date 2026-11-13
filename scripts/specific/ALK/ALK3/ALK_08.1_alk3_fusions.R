@@ -183,7 +183,7 @@ driver_traj <- bind_rows(lapply(DRUGS, function(drug) {
 
 if (all(driver_traj$FFPM == 0)) {
   cat("  ⚠ ", driver_fusion, " not detected in any sample — check the exact fusion name",
-      "en 08_fusions_all_samples.csv\n\n")
+      "in 08_fusions_all_samples.csv\n\n")
 }
 
 write.csv(driver_traj, file.path(OUT_DIR, "tables", "08_fusions_driver_trajectory.csv"), row.names = FALSE)
@@ -198,7 +198,7 @@ driver_theme <- theme_minimal(base_size = 12) +
     plot.background  = element_rect(fill = "white")
   )
 driver_labs <- labs(
-  subtitle = paste0("ALK3: ", driver_fusion, " (misma fusión en ambas ramas de fármaco)"),
+  subtitle = paste0("ALK3: ", driver_fusion, " (same fusion in both drug branches)"),
   x = NULL, y = "FFPM (fusion fragments per million)"
 )
 
@@ -207,7 +207,7 @@ p_driver_line <- ggplot(driver_traj, aes(x = Sample, y = FFPM, group = Drug, col
   geom_point(size = 2.5) +
   facet_wrap(~ Drug, scales = "free_x", ncol = 1) +
   scale_color_manual(values = DRUG_COLORS_ALK) +
-  labs(title = paste("Fusión driver EML4-ALK — evolución Untreated -> Treated -> Resistant (lineplot) —", CELL_LINE)) +
+  labs(title = paste("EML4-ALK driver fusion — evolution Untreated -> Treated -> Resistant (lineplot) —", CELL_LINE)) +
   driver_labs + driver_theme
 
 ggsave(file.path(OUT_DIR, "figures", "08_fusions_driver_lineplot.png"),
@@ -218,7 +218,7 @@ p_driver_bar <- ggplot(driver_traj, aes(x = Sample, y = FFPM, fill = Drug)) +
   geom_col(alpha = 0.9) +
   facet_wrap(~ Drug, scales = "free_x", ncol = 1) +
   scale_fill_manual(values = DRUG_COLORS_ALK) +
-  labs(title = paste("Fusión driver EML4-ALK — evolución Untreated -> Treated -> Resistant (barplot) —", CELL_LINE)) +
+  labs(title = paste("EML4-ALK driver fusion — evolution Untreated -> Treated -> Resistant (barplot) —", CELL_LINE)) +
   driver_labs + driver_theme
 
 ggsave(file.path(OUT_DIR, "figures", "08_fusions_driver_barplot.png"),
@@ -232,7 +232,7 @@ p_driver_dot <- ggplot(driver_traj, aes(x = Sample, y = 1,
   scale_color_gradientn(colors = GRADIENTE_RNA) +
   scale_size_continuous(range = c(1, 12)) +
   labs(
-    title = paste("Fusión driver EML4-ALK — evolución Untreated -> Treated -> Resistant (dotplot) —", CELL_LINE),
+    title = paste("EML4-ALK driver fusion — evolution Untreated -> Treated -> Resistant (dotplot) —", CELL_LINE),
     subtitle = paste0("ALK3: ", driver_fusion),
     x = NULL, y = NULL, color = "FFPM", size = "Junction\nreads"
   ) +
@@ -314,7 +314,7 @@ plot_fusion_heatmap <- function(drug, n = TOP_N_HEATMAP) {
            show_rownames = TRUE,
            show_colnames = TRUE,
            fontsize_row = 9,
-           main = paste0("Fusiones RNA (top ", n, " FFPM) — ", drug, " — ", CELL_LINE),
+           main = paste0("RNA fusions (top ", n, " FFPM) — ", drug, " — ", CELL_LINE),
            filename = file.path(OUT_DIR, "figures", paste0("08_fusions_heatmap_", drug, ".png")),
            width = 9, height = max(4, length(top_fusions) * 0.5))
   cat("  →", paste0("figures/08_fusions_heatmap_", drug, ".png"), "\n")
@@ -345,7 +345,7 @@ if (length(top_fusions_combined) >= 2) {
            show_colnames = TRUE,
            fontsize_row = 9,
            fontsize_col = 8,
-           main = paste0("Fusiones RNA — unión top ", TOP_N_HEATMAP, " por fármaco (Lorlatinib + Alectinib) — ", CELL_LINE),
+           main = paste0("RNA fusions — union top ", TOP_N_HEATMAP, " per drug (Lorlatinib + Alectinib) — ", CELL_LINE),
            filename = file.path(OUT_DIR, "figures", combined_fig),
            width = 12, height = max(4, length(top_fusions_combined) * 0.5))
   cat("  →", file.path("figures", combined_fig), "(", length(top_fusions_combined), "fusions )\n\n")
@@ -411,31 +411,31 @@ driver_check <- driver_traj %>%
   summarise(min_FFPM = round(min(FFPM), 2), max_FFPM = round(max(FFPM), 2), .groups = "drop")
 
 report_text <- paste0(
-  "# Fusiones RNA (STAR-Fusion) — ALK: ALK3 (Lorlatinib + Alectinib)\n\n",
-  "## Fuente\n",
-  "- ", length(fusion_files), " archivos tsv en `data/fusions/` (STAR-Fusion, salida abridged.coding_effect)\n",
-  "- Muestras identificadas por Model (ALK3, ALK3_L, ALK3_A, ALK3_L2-L10, ALK3_A2-A4); ID de secuenciación original en `Sample_ID`\n",
-  "- ", nrow(fusions_all), " eventos de fusión totales, ", length(unique(fusions_all$`#FusionName`)), " fusiones únicas\n\n",
-  "## Fusión driver — confirmación a nivel de RNA, por fármaco\n",
+  "# RNA fusions (STAR-Fusion) — ALK: ALK3 (Lorlatinib + Alectinib)\n\n",
+  "## Source\n",
+  "- ", length(fusion_files), " tsv files in `data/fusions/` (STAR-Fusion, abridged.coding_effect output)\n",
+  "- Samples identified by Model (ALK3, ALK3_L, ALK3_A, ALK3_L2-L10, ALK3_A2-A4); original sequencing ID in `Sample_ID`\n",
+  "- ", nrow(fusions_all), " total fusion events, ", length(unique(fusions_all$`#FusionName`)), " unique fusions\n\n",
+  "## Driver fusion — confirmation at RNA level, per drug\n",
   paste(capture.output(print(as.data.frame(driver_check), row.names = FALSE)), collapse = "\n"), "\n",
-  "- Misma fusión esperada en ambas ramas (mismo clon parental ALK3): ", driver_fusion, "\n\n",
-  "## Fusiones más llamativas por fármaco (top ", TOP_N, ")\n",
-  "Ver `tables/08_fusions_top_striking.csv`. Criterio: LargeAnchorSupport=YES_LDAS y/o fusión driver, ",
-  "ordenadas por FFPM medio; se marca `known_db` si aparece en ChimerKB/COSMIC/Mitelman.\n\n",
-  "## Coincidencias entre fármacos\n",
-  "Ver `tables/08_fusions_shared_drugs.csv` — ", nrow(shared), " fusiones detectadas en ambas ramas (Lorlatinib y Alectinib).\n\n",
-  "## Interpretación\n",
-  "[INTERPRETAR]\n",
-  "- ¿Se mantiene la fusión driver en las 8 resistentes o se pierde en alguna (cambio de driver)?\n",
-  "- ¿Las fusiones compartidas entre fármacos son ruido técnico (read-through) o candidatas biológicas?\n",
-  "- ¿Alguna fusión nueva aparece únicamente en un fármaco (adquirida específica de esa generación de inhibidor)?\n\n",
-  "## Figuras\n",
-  "- 08_fusions_driver_lineplot.png (faceteado por fármaco)\n",
-  "- 08_fusions_driver_barplot.png (faceteado por fármaco)\n",
-  "- 08_fusions_driver_dotplot.png (tamaño=JunctionReadCount, color=FFPM, faceteado por fármaco)\n",
+  "- Same fusion expected in both branches (same ALK3 parental clone): ", driver_fusion, "\n\n",
+  "## Most striking fusions per drug (top ", TOP_N, ")\n",
+  "See `tables/08_fusions_top_striking.csv`. Criterion: LargeAnchorSupport=YES_LDAS and/or driver fusion, ",
+  "ordered by mean FFPM; `known_db` is flagged if present in ChimerKB/COSMIC/Mitelman.\n\n",
+  "## Overlaps between drugs\n",
+  "See `tables/08_fusions_shared_drugs.csv` — ", nrow(shared), " fusions detected in both branches (Lorlatinib and Alectinib).\n\n",
+  "## Interpretation\n",
+  "[INTERPRET]\n",
+  "- Is the driver fusion maintained in all 8 resistant lines or lost in any (driver switch)?\n",
+  "- Are the fusions shared between drugs technical noise (read-through) or biological candidates?\n",
+  "- Does any new fusion appear in only one drug (acquired, specific to that inhibitor generation)?\n\n",
+  "## Figures\n",
+  "- 08_fusions_driver_lineplot.png (faceted by drug)\n",
+  "- 08_fusions_driver_barplot.png (faceted by drug)\n",
+  "- 08_fusions_driver_dotplot.png (size=JunctionReadCount, color=FFPM, faceted by drug)\n",
   "- 08_fusions_heatmap_Lorlatinib.png (top ", TOP_N_HEATMAP, ")\n",
   "- 08_fusions_heatmap_Alectinib.png (top ", TOP_N_HEATMAP, ")\n",
-  "- 08_fusions_heatmap_combined_top", TOP_N_HEATMAP, ".png (unión Lorlatinib + Alectinib)\n"
+  "- 08_fusions_heatmap_combined_top", TOP_N_HEATMAP, ".png (union Lorlatinib + Alectinib)\n"
 )
 writeLines(report_text, file.path(OUT_DIR, "report", "08_fusions_report.md"))
 cat("Report: ALK/ALK3/report/08_fusions_report.md\n\n")

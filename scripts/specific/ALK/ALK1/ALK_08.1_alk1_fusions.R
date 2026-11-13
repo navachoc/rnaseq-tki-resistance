@@ -183,7 +183,7 @@ driver_labs <- labs(
 p_driver_line <- ggplot(driver_traj, aes(x = Sample, y = FFPM, group = 1)) +
   geom_line(linewidth = 0.9, alpha = 0.85, color = cellline_colors[[CELL_LINE]]) +
   geom_point(size = 2.5, color = cellline_colors[[CELL_LINE]]) +
-  labs(title = paste("Fusión driver EML4-ALK v3 — evolución Untreated -> Treated -> Resistant (lineplot) —", CELL_LINE)) +
+  labs(title = paste("EML4-ALK v3 driver fusion — evolution Untreated -> Treated -> Resistant (lineplot) —", CELL_LINE)) +
   driver_labs + driver_theme
 
 ggsave(file.path(OUT_DIR, "figures", "08_fusions_driver_lineplot.png"),
@@ -196,7 +196,7 @@ p_driver_dot <- ggplot(driver_traj, aes(x = Sample, y = 1,
   scale_color_gradientn(colors = GRADIENTE_RNA) +
   scale_size_continuous(range = c(1, 12)) +
   labs(
-    title = paste("Fusión driver EML4-ALK v3 — evolución Untreated -> Treated -> Resistant (dotplot) —", CELL_LINE),
+    title = paste("EML4-ALK v3 driver fusion — evolution Untreated -> Treated -> Resistant (dotplot) —", CELL_LINE),
     subtitle = paste0(CELL_LINE, ": ", driver_fusion),
     x = NULL, y = NULL, color = "FFPM", size = "Junction\nreads"
   ) +
@@ -254,7 +254,7 @@ if (length(top_fusions) >= 2) {
            show_rownames = TRUE,
            show_colnames = TRUE,
            fontsize_row = 9,
-           main = paste0("Fusiones RNA (top ", TOP_N_HEATMAP, " FFPM) — ", CELL_LINE),
+           main = paste0("RNA fusions (top ", TOP_N_HEATMAP, " FFPM) — ", CELL_LINE),
            filename = file.path(OUT_DIR, "figures", paste0("08_fusions_heatmap_", CELL_LINE, ".png")),
            width = 9, height = max(4, length(top_fusions) * 0.5))
   cat("  →", paste0("figures/08_fusions_heatmap_", CELL_LINE, ".png"), "\n\n")
@@ -298,24 +298,24 @@ driver_check <- driver_traj %>%
   summarise(min_FFPM = round(min(FFPM), 2), max_FFPM = round(max(FFPM), 2))
 
 report_text <- paste0(
-  "# Fusiones RNA (STAR-Fusion) — ALK: ", CELL_LINE, "\n\n",
-  "## Fuente\n",
-  "- ", length(fusion_files), " archivos tsv en `data/fusions/` (STAR-Fusion, salida abridged.coding_effect)\n",
-  "- Muestras identificadas por Model (ALK1, ALK1_L, ALK1_L1-L3); ID de secuenciación original en `Sample_ID`\n",
-  "- ", nrow(fusions_all), " eventos de fusión totales, ", length(unique(fusions_all$`#FusionName`)), " fusiones únicas\n\n",
-  "## Fusión driver — confirmación a nivel de RNA\n",
-  "- ", CELL_LINE, " (EML4-ALK v3): FFPM rango [", driver_check$min_FFPM, ", ", driver_check$max_FFPM, "]\n\n",
-  "## Fusiones más llamativas (top ", TOP_N, ")\n",
-  "Ver `tables/08_fusions_top_striking.csv`. Criterio: LargeAnchorSupport=YES y/o fusión driver, ",
-  "ordenadas por FFPM medio; se marca `known_db` si aparece en ChimerKB/COSMIC/Mitelman.\n\n",
-  "## Interpretación\n",
-  "[INTERPRETAR]\n",
-  "- ¿Se mantiene la fusión driver en los 3 resistentes (L1-L3) o se pierde en alguno (cambio de driver)?\n",
-  "- ¿Alguna fusión nueva aparece únicamente en resistentes (adquirida) vs. presente ya en parental?\n\n",
-  "## Figuras\n",
+  "# RNA fusions (STAR-Fusion) — ALK: ", CELL_LINE, "\n\n",
+  "## Source\n",
+  "- ", length(fusion_files), " tsv files in `data/fusions/` (STAR-Fusion, abridged.coding_effect output)\n",
+  "- Samples identified by Model (ALK1, ALK1_L, ALK1_L1-L3); original sequencing ID in `Sample_ID`\n",
+  "- ", nrow(fusions_all), " total fusion events, ", length(unique(fusions_all$`#FusionName`)), " unique fusions\n\n",
+  "## Driver fusion — confirmation at RNA level\n",
+  "- ", CELL_LINE, " (EML4-ALK v3): FFPM range [", driver_check$min_FFPM, ", ", driver_check$max_FFPM, "]\n\n",
+  "## Most striking fusions (top ", TOP_N, ")\n",
+  "See `tables/08_fusions_top_striking.csv`. Criterion: LargeAnchorSupport=YES and/or driver fusion, ",
+  "ordered by mean FFPM; `known_db` is flagged if present in ChimerKB/COSMIC/Mitelman.\n\n",
+  "## Interpretation\n",
+  "[INTERPRET]\n",
+  "- Is the driver fusion maintained in all 3 resistant lines (L1-L3) or lost in any (driver switch)?\n",
+  "- Does any new fusion appear only in resistant lines (acquired) vs. already present in the parental?\n\n",
+  "## Figures\n",
   "- 08_fusions_driver_lineplot.png\n",
-  "- 08_fusions_driver_dotplot.png (tamaño=JunctionReadCount, color=FFPM, gradiente negro-gris-dorado)\n",
-  "- 08_fusions_heatmap_", CELL_LINE, ".png (top ", TOP_N_HEATMAP, "; gradiente negro-gris-dorado)\n"
+  "- 08_fusions_driver_dotplot.png (size=JunctionReadCount, color=FFPM, black-grey-gold gradient)\n",
+  "- 08_fusions_heatmap_", CELL_LINE, ".png (top ", TOP_N_HEATMAP, "; black-grey-gold gradient)\n"
 )
 writeLines(report_text, file.path(OUT_DIR, "report", "08_fusions_report.md"))
 cat("Report: ALK/", CELL_LINE, "/report/08_fusions_report.md\n\n", sep = "")

@@ -232,7 +232,7 @@ cat("\n")
 # REPORT --------------------------------------------------------------------
 extract_top <- function(res, type = "go", n = 10) {
   obj <- res[[type]]
-  if (is.null(obj) || nrow(obj@result) == 0) return("Sin resultados significativos")
+  if (is.null(obj) || nrow(obj@result) == 0) return("No significant results")
   top <- head(obj@result %>% arrange(p.adjust) %>%
                 dplyr::select(Description, p.adjust, Count), n)
   paste(capture.output(print(top, row.names = FALSE)), collapse = "\n")
@@ -240,8 +240,8 @@ extract_top <- function(res, type = "go", n = 10) {
 
 report_text <- paste0(
   "# Pathways Report — ", OUT_PREFIX, "\n\n",
-  "**Firma:** ",
-  if (USE_CONSERVATIVE) "conservadora (Mean_Expr_Unt > -5)" else "completa", "\n\n",
+  "**Signature:** ",
+  if (USE_CONSERVATIVE) "conservative (Mean_Expr_Unt > -5)" else "full", "\n\n",
   "## ORA GO BP — Upregulated (top 10)\n",
   extract_top(res_up, "go", 10), "\n\n",
   "## ORA KEGG — Upregulated (top 10)\n",
@@ -252,7 +252,7 @@ report_text <- paste0(
     "## ORA KEGG — Downregulated (top 10)\n",
     extract_top(res_down, "kegg", 10), "\n\n"
   ) else "",
-  "## Figuras\n",
+  "## Figures\n",
   "- 04_go_bp_upregulated.png\n",
   "- 04_kegg_upregulated.png\n",
   if (!is.null(res_down)) "- 04_go_bp_downregulated.png\n- 04_kegg_downregulated.png\n" else "",

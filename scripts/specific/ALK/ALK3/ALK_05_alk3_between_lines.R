@@ -139,7 +139,7 @@ ph_dist <- pheatmap(dist_mat,
          color          = heatmap_expr,
          annotation_col = ann_res,
          annotation_colors = ann_colors_res,
-         main           = paste("Distancias entre líneas resistentes —", OUT_PREFIX),
+         main           = paste("Distances between resistant lines —", OUT_PREFIX),
          silent         = TRUE)
 grid::grid.newpage()
 grid::grid.draw(ph_dist$gtable)
@@ -182,7 +182,7 @@ distinctive <- lfc_per_line %>%
   ungroup() %>%
   arrange(Model, desc(abs(LFC_vs_otras)))
 
-write.csv(distinctive, file.path(RESULTS_DIR, "tables", "05_genes_distintivos_por_linea.csv"), row.names = FALSE)
+write.csv(distinctive, file.path(RESULTS_DIR, "tables", "05_distinctive_genes_per_line.csv"), row.names = FALSE)
 cat("  Distinctive genes of a single line (not shared):", nrow(distinctive), "\n")
 for (li in resistant) {
   n_li <- sum(distinctive$Model == li)
@@ -195,7 +195,7 @@ distinctive_core <- distinctive %>% filter(Gene %in% alk_resistance_core)
 distinctive_wes  <- distinctive %>% filter(Gene %in% wes_panel_alk)
 cat("  alk_resistance_core:", paste0(distinctive_core$Gene, " [", distinctive_core$Model, "]", collapse = ", "), "\n")
 cat("  wes_panel_alk:      ", paste0(distinctive_wes$Gene,  " [", distinctive_wes$Model,  "]", collapse = ", "), "\n\n")
-write.csv(distinctive_wes, file.path(RESULTS_DIR, "tables", "05_genes_distintivos_wes_panel.csv"), row.names = FALSE)
+write.csv(distinctive_wes, file.path(RESULTS_DIR, "tables", "05_distinctive_genes_wes_panel.csv"), row.names = FALSE)
 
 # STEP 3: PAIRED SCATTERS WITHIN EACH DRUG ----------------------------
 cat("5. Paired scatters within each drug...\n")
@@ -226,7 +226,7 @@ for (par in pares) {
     geom_text_repel(aes(label = label), size = 2.5, max.overlaps = 20,
                     segment.size = 0.2, box.padding = 0.3, color = "#e67e22", seed = 1) +
     labs(
-      title = paste0("Expresión ", a, " vs ", b, " — ", OUT_PREFIX),
+      title = paste0("Expression ", a, " vs ", b, " — ", OUT_PREFIX),
       subtitle = paste("Pearson r =", r_val),
       x = paste("log2CPM —", a), y = paste("log2CPM —", b)
     ) +
@@ -261,13 +261,13 @@ ph_var <- pheatmap(z_mat,
          cluster_rows      = TRUE,
          cluster_cols      = TRUE,
          clustering_method = "ward.D2",
-         main = paste0("Top ", length(top_var), " genes más variables entre líneas + forzados — ", OUT_PREFIX),
+         main = paste0("Top ", length(top_var), " most variable genes between lines + forced — ", OUT_PREFIX),
          silent = TRUE)
 grid::grid.newpage()
 grid::grid.draw(ph_var$gtable)
-save_pheatmap(ph_var, file.path(RESULTS_DIR, "figures", "05_heatmap_variables_entre_lineas.png"),
+save_pheatmap(ph_var, file.path(RESULTS_DIR, "figures", "05_heatmap_variable_between_lines.png"),
               width = 9, height = 10)
-cat("  → 05_heatmap_variables_entre_lineas.png (", length(genes_hm), "genes)\n\n")
+cat("  → 05_heatmap_variable_between_lines.png (", length(genes_hm), "genes)\n\n")
 
 # ==============================================================================
 # STEP 5 (ALK3-SPECIFIC): DRUG GROUP COMPARISON
@@ -293,7 +293,7 @@ grupo_table <- tibble::tibble(
   LFC_Lorlatinib_vs_Alectinib   = lfc_grupo,
   Classification                = classify_lfc(lfc_grupo, LOGFC_THRESHOLD)
 )
-write.csv(grupo_table, file.path(RESULTS_DIR, "tables", "05_lfc_grupo_farmaco.csv"), row.names = FALSE)
+write.csv(grupo_table, file.path(RESULTS_DIR, "tables", "05_lfc_drug_group.csv"), row.names = FALSE)
 
 tab_grupo <- table(grupo_table$Classification)
 cat("  Distribution:\n")
@@ -333,14 +333,14 @@ if (length(genes_grupo) >= 2) {
            cluster_rows      = TRUE,
            cluster_cols      = FALSE,
            clustering_method = "ward.D2",
-           main = paste0("Lorlatinib (5 líneas) vs Alectinib (3 líneas) — ", OUT_PREFIX,
-                         " (", length(top_grupo_up), " up / ", length(top_grupo_down), " down + forzados)"),
+           main = paste0("Lorlatinib (5 lines) vs Alectinib (3 lines) — ", OUT_PREFIX,
+                         " (", length(top_grupo_up), " up / ", length(top_grupo_down), " down + forced)"),
            silent = TRUE)
   grid::grid.newpage()
   grid::grid.draw(ph_grupo$gtable)
-  save_pheatmap(ph_grupo, file.path(RESULTS_DIR, "figures", "05_heatmap_grupo_farmaco.png"),
+  save_pheatmap(ph_grupo, file.path(RESULTS_DIR, "figures", "05_heatmap_drug_group.png"),
                 width = 9, height = 10)
-  cat("  → 05_heatmap_grupo_farmaco.png (", length(genes_grupo), "genes,",
+  cat("  → 05_heatmap_drug_group.png (", length(genes_grupo), "genes,",
       length(top_grupo_up), "up /", length(top_grupo_down), "down)\n\n")
 } else {
   cat("  Fewer than 2 genes distinguish the groups — heatmap skipped\n\n")
@@ -350,44 +350,44 @@ if (length(genes_grupo) >= 2) {
 cat("8. Generating report...\n")
 
 report_text <- paste0(
-  "# Comparación entre líneas resistentes — ", OUT_PREFIX, "\n\n",
-  "**Pregunta 1:** ¿en qué se diferencian las 8 líneas resistentes entre sí, más allá de lo que ",
-  "cada una comparte frente a su propia parental/tratada?\n",
-  "**Pregunta 2 (específica ALK3):** ¿qué distingue la vía de resistencia de las 5 líneas ",
-  "Lorlatinib de las 3 líneas Alectinib?\n",
-  "**Método:** LFC directo (sin réplicas técnicas -> sin test estadístico formal). Threshold |LFC| >= ", LOGFC_THRESHOLD, "\n\n",
-  "## 1. Correlación entre líneas (Pearson, log2CPM)\n",
+  "# Comparison between resistant lines — ", OUT_PREFIX, "\n\n",
+  "**Question 1:** how do the 8 resistant lines differ from each other, beyond what ",
+  "each shares relative to its own parental/treated?\n",
+  "**Question 2 (ALK3-specific):** what distinguishes the resistance pathway of the 5 ",
+  "Lorlatinib lines from the 3 Alectinib lines?\n",
+  "**Method:** direct LFC (no technical replicates -> no formal statistical test). Threshold |LFC| >= ", LOGFC_THRESHOLD, "\n\n",
+  "## 1. Correlation between lines (Pearson, log2CPM)\n",
   paste(capture.output(print(round(cor_mat, 3))), collapse = "\n"), "\n\n",
-  "## 2. Genes distintivos por línea individual (fuera de threshold en una sola línea)\n",
+  "## 2. Distinctive genes per individual line (outside threshold in a single line only)\n",
   paste(capture.output(print(as.data.frame(tab_per_line), row.names = FALSE)), collapse = "\n"), "\n",
-  "- Total distintivos (no compartidos entre líneas): ", nrow(distinctive), "\n\n",
-  "## 3. Cruce genes distintivos por línea con paneles curados\n",
+  "- Total distinctive (not shared between lines): ", nrow(distinctive), "\n\n",
+  "## 3. Overlap of per-line distinctive genes with curated panels\n",
   "- alk_resistance_core: ", if (nrow(distinctive_core) > 0)
-    paste0(distinctive_core$Gene, " [", distinctive_core$Model, "]", collapse = ", ") else "ninguno", "\n",
+    paste0(distinctive_core$Gene, " [", distinctive_core$Model, "]", collapse = ", ") else "none", "\n",
   "- wes_panel_alk: ", if (nrow(distinctive_wes) > 0)
-    paste0(distinctive_wes$Gene, " [", distinctive_wes$Model, "]", collapse = ", ") else "ninguno", "\n\n",
-  "## 4. Comparación por grupo fármaco (Lorlatinib vs Alectinib)\n",
-  "- Upregulated en Lorlatinib: ", tab_grupo["Upregulated"], " | Downregulated: ", tab_grupo["Downregulated"], "\n",
-  "- alk_resistance_core más alto en Lorlatinib: ", if (length(grupo_core_up) > 0) paste(grupo_core_up, collapse = ", ") else "ninguno", "\n",
-  "- alk_resistance_core más alto en Alectinib: ", if (length(grupo_core_down) > 0) paste(grupo_core_down, collapse = ", ") else "ninguno", "\n",
-  "- wes_panel_alk más alto en Lorlatinib: ", if (length(grupo_wes_up) > 0) paste(grupo_wes_up, collapse = ", ") else "ninguno", "\n",
-  "- wes_panel_alk más alto en Alectinib: ", if (length(grupo_wes_down) > 0) paste(grupo_wes_down, collapse = ", ") else "ninguno", "\n",
-  "- Ver 05_lfc_grupo_farmaco.csv para la tabla completa\n\n",
-  "## Genes forzados\n",
-  "- ", paste(FORCED_GENES, collapse = ", "), " — siempre incluidos en ambos heatmaps y etiquetados en los scatters\n\n",
-  "## Tablas\n",
+    paste0(distinctive_wes$Gene, " [", distinctive_wes$Model, "]", collapse = ", ") else "none", "\n\n",
+  "## 4. Comparison by drug group (Lorlatinib vs Alectinib)\n",
+  "- Upregulated in Lorlatinib: ", tab_grupo["Upregulated"], " | Downregulated: ", tab_grupo["Downregulated"], "\n",
+  "- alk_resistance_core higher in Lorlatinib: ", if (length(grupo_core_up) > 0) paste(grupo_core_up, collapse = ", ") else "none", "\n",
+  "- alk_resistance_core higher in Alectinib: ", if (length(grupo_core_down) > 0) paste(grupo_core_down, collapse = ", ") else "none", "\n",
+  "- wes_panel_alk higher in Lorlatinib: ", if (length(grupo_wes_up) > 0) paste(grupo_wes_up, collapse = ", ") else "none", "\n",
+  "- wes_panel_alk higher in Alectinib: ", if (length(grupo_wes_down) > 0) paste(grupo_wes_down, collapse = ", ") else "none", "\n",
+  "- See 05_lfc_drug_group.csv for the full table\n\n",
+  "## Forced genes\n",
+  "- ", paste(FORCED_GENES, collapse = ", "), " — always included in both heatmaps and labelled in the scatters\n\n",
+  "## Tables\n",
   "- 05_correlation_between_lines.csv\n",
-  "- 05_lfc_per_line.csv (LFC de cada línea vs media de las otras 7)\n",
-  "- 05_genes_distintivos_por_linea.csv (solo genes exclusivos de 1 línea)\n",
-  "- 05_genes_distintivos_wes_panel.csv\n",
-  "- 05_lfc_grupo_farmaco.csv (Lorlatinib vs Alectinib, tabla completa)\n\n",
-  "## Figuras\n",
-  "- 05_distances_between_lines.png (con anotación Drug)\n",
+  "- 05_lfc_per_line.csv (LFC of each line vs mean of the other 7)\n",
+  "- 05_distinctive_genes_per_line.csv (only genes exclusive to 1 line)\n",
+  "- 05_distinctive_genes_wes_panel.csv\n",
+  "- 05_lfc_drug_group.csv (Lorlatinib vs Alectinib, full table)\n\n",
+  "## Figures\n",
+  "- 05_distances_between_lines.png (with Drug annotation)\n",
   paste(paste0("- 05_scatter_", sapply(pares, `[`, 1), "_vs_", sapply(pares, `[`, 2), ".png\n"), collapse = ""),
-  "- 05_heatmap_variables_entre_lineas.png (top ", length(top_var), " por varianza + ",
-  paste(FORCED_GENES, collapse = "/"), " forzados)\n",
-  "- 05_heatmap_grupo_farmaco.png (Lorlatinib vs Alectinib, top ", length(top_grupo_up), " up + top ",
-  length(top_grupo_down), " down + forzados)\n"
+  "- 05_heatmap_variable_between_lines.png (top ", length(top_var), " by variance + ",
+  paste(FORCED_GENES, collapse = "/"), " forced)\n",
+  "- 05_heatmap_drug_group.png (Lorlatinib vs Alectinib, top ", length(top_grupo_up), " up + top ",
+  length(top_grupo_down), " down + forced)\n"
 )
 writeLines(report_text, file.path(RESULTS_DIR, "report", "05_between_lines_report.md"))
 cat("Report: report/05_between_lines_report.md\n\n")

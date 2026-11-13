@@ -184,7 +184,7 @@ p_driver_line <- ggplot(driver_traj, aes(x = Sample, y = FFPM, group = Cell_Line
   geom_point(size = 2.5) +
   facet_wrap(~ Cell_Line, scales = "free_x", ncol = 1) +
   scale_color_manual(values = cellline_colors) +
-  labs(title = "Fusión driver RET — evolución Untreated -> Treated -> Resistant (lineplot)") +
+  labs(title = "RET driver fusion — evolution Untreated -> Treated -> Resistant (lineplot)") +
   driver_labs + driver_theme
 
 ggsave(file.path(OUT_DIR, "figures", "08_fusions_driver_lineplot.png"),
@@ -195,7 +195,7 @@ p_driver_bar <- ggplot(driver_traj, aes(x = Sample, y = FFPM, fill = Cell_Line))
   geom_col(alpha = 0.9) +
   facet_wrap(~ Cell_Line, scales = "free_x", ncol = 1) +
   scale_fill_manual(values = cellline_colors) +
-  labs(title = "Fusión driver RET — evolución Untreated -> Treated -> Resistant (barplot)") +
+  labs(title = "RET driver fusion — evolution Untreated -> Treated -> Resistant (barplot)") +
   driver_labs + driver_theme
 
 ggsave(file.path(OUT_DIR, "figures", "08_fusions_driver_barplot.png"),
@@ -211,7 +211,7 @@ p_driver_dot <- ggplot(driver_traj, aes(x = Sample, y = 1,
   scale_color_gradientn(colors = c("#3498db", "#ecf0f1", "#922b21")) +
   scale_size_continuous(range = c(1, 12)) +
   labs(
-    title = "Fusión driver RET — evolución Untreated -> Treated -> Resistant (dotplot)",
+    title = "RET driver fusion — evolution Untreated -> Treated -> Resistant (dotplot)",
     subtitle = paste0("RET1: ", driver_fusion["RET1"], "  |  RET2: ", driver_fusion["RET2"]),
     x = NULL, y = NULL, color = "FFPM", size = "Junction\nreads"
   ) +
@@ -292,21 +292,21 @@ build_ann_colors <- function(ann_col) {
   ann_colors
 }
 
-# Spanish legends (same criterion as the other RNA heatmaps): only the legend
-# TITLE is translated (Condition->Condición, Drug->Inhibidor, not "Fármaco",
+# Legend labels (same criterion as the other RNA heatmaps): only the legend
+# TITLE is renamed (Condition->Condition, Drug->Drug, Cell_Line->Model,
 # same criterion as RET_08/RET_09) and the Condition values
-# (Resistance->Resistente). Drug (BLU667/LOXO292/No) and Cell_Line
+# (Resistance->Resistant). Drug (BLU667/LOXO292/No) and Cell_Line
 # (RET1/RET2) are NOT translated: they are technical codes/model names, not
 # descriptive text. Applied AFTER build_ann_colors() (which matches by English
 # column name against config/colors.R), not before: if ann_col were renamed
 # first, filter_annotation_colors() would no longer find a match.
-TRADUCCION_TITULO_ES <- c(Condition = "Condición", Drug = "Inhibidor", Cell_Line = "Modelo")
+TRADUCCION_TITULO_ES <- c(Condition = "Condition", Drug = "Drug", Cell_Line = "Model")
 
 traducir_leyenda_es <- function(ann_col, ann_colors) {
   if ("Condition" %in% colnames(ann_col)) {
-    ann_col$Condition <- ifelse(ann_col$Condition == "Resistance", "Resistente", ann_col$Condition)
+    ann_col$Condition <- ifelse(ann_col$Condition == "Resistance", "Resistant", ann_col$Condition)
     if (!is.null(ann_colors$Condition)) {
-      names(ann_colors$Condition) <- ifelse(names(ann_colors$Condition) == "Resistance", "Resistente", names(ann_colors$Condition))
+      names(ann_colors$Condition) <- ifelse(names(ann_colors$Condition) == "Resistance", "Resistant", names(ann_colors$Condition))
     }
   }
   renombrar <- function(nombres) {
@@ -339,7 +339,7 @@ plot_fusion_heatmap <- function(cl, n = TOP_N_HEATMAP) {
            show_rownames = TRUE,
            show_colnames = TRUE,
            fontsize_row = 9,
-           main = paste0("Fusiones RNA (top ", n, " FFPM) — ", cl),
+           main = paste0("RNA fusions (top ", n, " FFPM) — ", cl),
            filename = file.path(OUT_DIR, "figures", paste0("08_fusions_heatmap_", cl, ".png")),
            width = 10, height = max(4, length(top_fusions) * 0.5))
   cat("  →", paste0("figures/08_fusions_heatmap_", cl, ".png"), "\n")
@@ -367,7 +367,7 @@ if (length(top_fusions_combined) >= 2) {
            show_colnames = TRUE,
            fontsize_row = 9,
            fontsize_col = 7,
-           main = paste0("Fusiones RNA — unión top ", TOP_N_HEATMAP, " por modelo (RET1 + RET2)"),
+           main = paste0("RNA fusions — union top ", TOP_N_HEATMAP, " per model (RET1 + RET2)"),
            filename = file.path(OUT_DIR, "figures", combined_fig),
            width = 16, height = max(4, length(top_fusions_combined) * 0.5))
   cat("  →", file.path("figures", combined_fig), "(", length(top_fusions_combined), "fusions )\n")
@@ -436,31 +436,31 @@ driver_check <- driver_traj %>%
   summarise(min_FFPM = round(min(FFPM), 2), max_FFPM = round(max(FFPM), 2), .groups = "drop")
 
 report_text <- paste0(
-  "# Fusiones RNA (STAR-Fusion) — RET: RET1 + RET2\n\n",
-  "## Fuente\n",
-  "- ", length(fusion_files), " archivos xlsx en `data/fusions/` (STAR-Fusion + FusionInspector)\n",
-  "- ", nrow(fusions_all), " eventos de fusión totales, ", length(unique(fusions_all$`#FusionName`)), " fusiones únicas\n\n",
-  "## Fusión driver — confirmación a nivel de RNA\n",
+  "# RNA fusions (STAR-Fusion) — RET: RET1 + RET2\n\n",
+  "## Source\n",
+  "- ", length(fusion_files), " xlsx files in `data/fusions/` (STAR-Fusion + FusionInspector)\n",
+  "- ", nrow(fusions_all), " total fusion events, ", length(unique(fusions_all$`#FusionName`)), " unique fusions\n\n",
+  "## Driver fusion — confirmation at RNA level\n",
   paste(capture.output(print(as.data.frame(driver_check), row.names = FALSE)), collapse = "\n"), "\n",
   "- RET1: ", driver_fusion["RET1"], "\n",
   "- RET2: ", driver_fusion["RET2"], "\n\n",
-  "## Fusiones más llamativas por modelo (top ", TOP_N, ")\n",
-  "Ver `tables/08_fusions_top_striking.csv`. Criterio: LargeAnchorSupport=YES y/o fusión driver, ",
-  "ordenadas por FFPM medio; se marca `known_db` si aparece en ChimerKB/COSMIC/Mitelman.\n\n",
-  "## Coincidencias entre modelos\n",
-  "Ver `tables/08_fusions_shared_models.csv` — ", nrow(shared), " fusiones detectadas en ambos modelos (RET1 y RET2).\n\n",
-  "## Interpretación\n",
-  "[INTERPRETAR]\n",
-  "- ¿Se mantiene la fusión driver en todos los resistentes o se pierde en alguno (cambio de driver)?\n",
-  "- ¿Las fusiones compartidas entre modelos son ruido técnico (read-through) o candidatas biológicas?\n",
-  "- ¿Alguna fusión nueva aparece únicamente en resistentes (adquirida) vs. presente ya en parental?\n\n",
-  "## Figuras\n",
+  "## Most striking fusions per model (top ", TOP_N, ")\n",
+  "See `tables/08_fusions_top_striking.csv`. Criterion: LargeAnchorSupport=YES and/or driver fusion, ",
+  "ordered by mean FFPM; `known_db` is flagged if present in ChimerKB/COSMIC/Mitelman.\n\n",
+  "## Overlaps between models\n",
+  "See `tables/08_fusions_shared_models.csv` — ", nrow(shared), " fusions detected in both models (RET1 and RET2).\n\n",
+  "## Interpretation\n",
+  "[INTERPRET]\n",
+  "- Is the driver fusion maintained in all resistant lines or lost in any (driver switch)?\n",
+  "- Are the fusions shared between models technical noise (read-through) or biological candidates?\n",
+  "- Does any new fusion appear only in resistant lines (acquired) vs. already present in the parental?\n\n",
+  "## Figures\n",
   "- 08_fusions_driver_lineplot.png\n",
   "- 08_fusions_driver_barplot.png\n",
-  "- 08_fusions_driver_dotplot.png (tamaño=JunctionReadCount, color=FFPM)\n",
+  "- 08_fusions_driver_dotplot.png (size=JunctionReadCount, color=FFPM)\n",
   "- 08_fusions_heatmap_RET1.png (top ", TOP_N_HEATMAP, ")\n",
   "- 08_fusions_heatmap_RET2.png (top ", TOP_N_HEATMAP, ")\n",
-  "- 08_fusions_heatmap_combined_top", TOP_N_HEATMAP, ".png (unión RET1 + RET2)\n"
+  "- 08_fusions_heatmap_combined_top", TOP_N_HEATMAP, ".png (union RET1 + RET2)\n"
 )
 writeLines(report_text, file.path(OUT_DIR, "report", "08_fusions_report.md"))
 cat("Report: RET/combined/report/08_fusions_report.md\n\n")

@@ -23,13 +23,13 @@
 #   RET1_L250     -> Condition=Parental,   Treatment=Yes, Drug=LOXO292  (acute)
 #   RET1_BR1/2/3  -> Condition=Resistance, Treatment=Yes, Drug=BLU667
 #   RET1_LR1/2/3  -> Condition=Resistance, Treatment=Yes, Drug=LOXO292
-# Condition3 collapses Condition into 2 levels (Parental/Resistente): the
+# Condition3 collapses Condition into 2 levels (Parental/Resistant): the
 # acutely treated parental (B250/L250) counts as Parental and the acute
-# treatment is still carried by the Inhibidor annotation (No/BLU667/LOXO292).
+# treatment is still carried by the Drug annotation (No/BLU667/LOXO292).
 # Same criterion as ALK (Parental/Resistant, Drug separate).
 #
-# Labels and axes are in English; titles and categories of the color legends
-# are in Spanish ("Condición", "Inhibidor"). Palettes are defined inline,
+# Labels, axes, and titles and categories of the color legends are in English
+# ("Condition", "Drug"). Palettes are defined inline,
 # without sourcing config/colors.R (same approach as the equivalent ALK
 # scripts). COLOR_DRUG does NOT use drug_colors from config/colors.R (ALK
 # scheme) but the BLU-667 purple / LOXO-292 green colors used in the other
@@ -44,7 +44,7 @@
 # Outputs (results/RET/combined/figures/):
 #   RET_08_fig1_pca_RET1.png / _RET2.png       (PCA)
 #   RET_08_fig1_heatmap_RET1.png / _RET2.png   (heatmap)
-#   RET_08_fig1_panel_combinado.png             (PCA + heatmap, 2 x 2)
+#   RET_08_fig1_panel_combined.png             (PCA + heatmap, 2 x 2)
 #
 # Dependencies (run first): scripts/simple/rna_01.1_qc.R with
 # DATASET = "RET1" and DATASET = "RET2".
@@ -69,11 +69,11 @@ dir.create(file.path(OUT_DIR, "figures"), recursive = TRUE, showWarnings = FALSE
 # technique identity shared across all figures).
 GRADIENTE_RNA <- c("#000000", "#808080", "#f2a900")
 
-# Condition3 (Parental/Resistente), 2 levels. The treated/untreated distinction
-# of the parental is still available via Inhibidor (shape in the PCA, color
+# Condition3 (Parental/Resistant), 2 levels. The treated/untreated distinction
+# of the parental is still available via Drug (shape in the PCA, color
 # strip in the heatmap: No/BLU667/LOXO292), without duplicating it as its own
 # Condition level. Same criterion as ALK (Parental/Resistant, Drug separate).
-COLOR_CONDICION <- c(Parental = "#e6a817", Resistente = "#013c58")
+COLOR_CONDICION <- c(Parental = "#e6a817", Resistant = "#013c58")
 
 # COLOR_DRUG aligned with the RET WES oncoplot and rna_08.1_fusions_
 # ret.R (fusions): BLU-667 purple / LOXO-292 green in ALL RET figures, not the
@@ -107,10 +107,10 @@ leer_tmm <- function(modelo) {
 leer_metadata <- function(modelo) {
   ruta <- here::here("results", "RET", modelo, "tables", "01_metadata_unit.csv")
   meta <- read.csv(ruta, stringsAsFactors = FALSE)
-  # Parental/Resistente only: the acutely treated parental counts as
+  # Parental/Resistant only: the acutely treated parental counts as
   # "Parental" like the untreated one; the acute treatment distinction is
-  # still carried by the Inhibidor annotation.
-  meta$Condition3 <- ifelse(meta$Condition == "Resistance", "Resistente", "Parental")
+  # still carried by the Drug annotation.
+  meta$Condition3 <- ifelse(meta$Condition == "Resistance", "Resistant", "Parental")
   meta
 }
 
@@ -154,15 +154,14 @@ construir_heatmap_modelo <- function(modelo, mat, meta, top_n, mostrar_leyenda =
   mat_z    <- sel$mat_z
   meta_ord <- sel$meta_ord
 
-  # Color legend in Spanish (title + categories): "Condición" and "Inhibidor"
-  # (same term as the ALK legends, not "Fármaco"). Argument names are in
-  # backticks because of the accent; the name passed here is what
+  # Color legend (title + categories): "Condition" and "Drug"
+  # (same term as the ALK legends). The argument name passed here is what
   # ComplexHeatmap uses as the default legend title (show_annotation_name=FALSE
   # only hides the side label of the color strip, not the legend title).
   ann_col <- HeatmapAnnotation(
-    `Condición` = setNames(meta_ord$Condition3, colnames(mat_z)),
-    Inhibidor   = setNames(meta_ord$Drug, colnames(mat_z)),
-    col = list(`Condición` = COLOR_CONDICION, Inhibidor = COLOR_DRUG),
+    Condition = setNames(meta_ord$Condition3, colnames(mat_z)),
+    Drug        = setNames(meta_ord$Drug, colnames(mat_z)),
+    col = list(Condition = COLOR_CONDICION, Drug = COLOR_DRUG),
     show_annotation_name = FALSE,
     show_legend = mostrar_leyenda,
     simple_anno_size = unit(3, "mm")
@@ -204,7 +203,7 @@ for (modelo in names(heatmaps)) {
 #     panel border) follows the ALK RNA-seq PCA (ALK_09_combined_figure.R;
 #     ALK_11 has no PCA).
 #
-#     Color = Condition (Parental/Resistente, 2 levels, see Condition3 in
+#     Color = Condition (Parental/Resistant, 2 levels, see Condition3 in
 #     section 1). Shape = Inhibitor (No/BLU667/LOXO292), same scheme as ALK
 #     (Drug as shape, not as color).
 # =============================================================================
@@ -237,9 +236,9 @@ construir_pca_modelo_rna <- function(modelo, mat, meta, top_n) {
     geom_text_repel(aes(label = Sample), color = "black", fontface = "bold", size = 3.3,
                      max.overlaps = Inf, box.padding = 0.5, point.padding = 0.3,
                      min.segment.length = 0, segment.size = 0.3, seed = 1, show.legend = FALSE) +
-    # Color legend in Spanish: "Condición"/"Inhibidor".
-    scale_color_manual(values = COLOR_CONDICION, name = "Condición") +
-    scale_shape_manual(values = FORMA_INHIBIDOR_PCA, drop = TRUE, name = "Inhibidor") +
+    # Color legend: "Condition"/"Drug".
+    scale_color_manual(values = COLOR_CONDICION, name = "Condition") +
+    scale_shape_manual(values = FORMA_INHIBIDOR_PCA, drop = TRUE, name = "Drug") +
     scale_x_continuous(expand = expansion(mult = 0.18)) +
     scale_y_continuous(expand = expansion(mult = 0.18)) +
     coord_cartesian(clip = "off") +
@@ -284,19 +283,19 @@ ht_ret2_comb  <- construir_heatmap_modelo("RET2",  tmm_ret2,  meta_ret2,  TOP_N_
 
 leyenda_compartida <- packLegend(
   Legend(col_fun = COL_FUN_RNA, title = "Z-score (TMM per gene)", direction = "horizontal", legend_width = unit(4, "cm")),
-  Legend(labels = names(COLOR_CONDICION), legend_gp = gpar(fill = COLOR_CONDICION), title = "Condición", direction = "horizontal"),
-  Legend(labels = names(COLOR_DRUG), legend_gp = gpar(fill = COLOR_DRUG), title = "Inhibidor", direction = "horizontal"),
+  Legend(labels = names(COLOR_CONDICION), legend_gp = gpar(fill = COLOR_CONDICION), title = "Condition", direction = "horizontal"),
+  Legend(labels = names(COLOR_DRUG), legend_gp = gpar(fill = COLOR_DRUG), title = "Drug", direction = "horizontal"),
   direction = "horizontal"
 )
 
-out_combinado <- file.path(OUT_DIR, "figures", "RET_08_fig1_panel_combinado.png")
+out_combinado <- file.path(OUT_DIR, "figures", "RET_08_fig1_panel_combined.png")
 
 # PCA row (ALTO_PCA, with its own color/shape legend included in each ggplot)
 # + heatmap row (ALTO_HEATMAP) + a final strip for the heatmap's shared
 # legend. The PCA legend is not shared via packLegend (mixing ggplot legends
 # with ComplexHeatmap ones in one Legend object is not trivial): each PCA
-# keeps its own Condición/Inhibidor legend at the right of the panel, and the
-# heatmap keeps its own (Z-score/Condición/Inhibidor) in the shared strip
+# keeps its own Condition/Drug legend at the right of the panel, and the
+# heatmap keeps its own (Z-score/Condition/Drug) in the shared strip
 # below.
 ALTO_PCA <- 6.5
 png(out_combinado, width = 2 * ANCHO_HEATMAP, height = ALTO_PCA + ALTO_HEATMAP + 1.5, units = "in", res = 300)

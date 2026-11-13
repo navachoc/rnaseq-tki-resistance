@@ -15,7 +15,7 @@
 #     genes labelled in black.
 #   Section 6. Functional enrichment of the signature, one GO BP plot and one
 #     KEGG plot, with upregulated and repressed genes (same style as RET_09
-#     and ALK_09c). Legends in Spanish.
+#     and ALK_09c). Legends in English.
 #   PCA and MA plot without legend or title.
 #
 # Inputs:
@@ -26,7 +26,7 @@
 #   results/MET/MET1/tables/04_kegg_{up,down}regulated.csv
 #
 # Outputs (results/MET/MET1/):
-#   figures/MET_01_fig14_pca_con_nombres.png, MET_01_fig14_pca_sin_nombres.png
+#   figures/MET_01_fig14_pca_with_names.png, MET_01_fig14_pca_no_names.png
 #   figures/MET_01_fig14_ma_plot.png
 #   figures/MET_01_fig15b_{go,kegg}.png, tables/MET_01_fig15b_{go,kegg}.csv
 #
@@ -113,12 +113,12 @@ p_con_nombres <- p_base +
   geom_text_repel(aes(label = Sample), size = 3, color = "black",
                   max.overlaps = 20, box.padding = 0.3, segment.size = 0.2, seed = 1)
 
-ggsave(file.path(OUT_DIR, "MET_01_fig14_pca_con_nombres.png"),
+ggsave(file.path(OUT_DIR, "MET_01_fig14_pca_with_names.png"),
        p_con_nombres, width = 10, height = 7, dpi = 300)
-ggsave(file.path(OUT_DIR, "MET_01_fig14_pca_sin_nombres.png"),
+ggsave(file.path(OUT_DIR, "MET_01_fig14_pca_no_names.png"),
        p_base, width = 10, height = 7, dpi = 300)
 
-cat("Saved in", OUT_DIR, ":\n  MET_01_fig14_pca_con_nombres.png\n  MET_01_fig14_pca_sin_nombres.png\n")
+cat("Saved in", OUT_DIR, ":\n  MET_01_fig14_pca_with_names.png\n  MET_01_fig14_pca_no_names.png\n")
 
 # 5. MA plot -------------------------------------------------------------------
 LOGFC_THRESHOLD <- 2.0   # same threshold as rna_02.1_lfc.R
@@ -279,10 +279,10 @@ dibujar_enriquecimiento <- function(fuente) {
   p <- ggplot(df, aes(x = FoldEnrichment, y = Description,
                       size = Count, fill = p.adjust, shape = Direccion)) +
     geom_point(color = "grey20", stroke = 0.3) +
-    scale_shape_manual(values = c(Up = 24, Down = 25), name = "Dirección",
-                       labels = c(Up = "Sobreexpresado", Down = "Reprimido"), drop = FALSE) +
+    scale_shape_manual(values = c(Up = 24, Down = 25), name = "Direction",
+                       labels = c(Up = "Upregulated", Down = "Downregulated"), drop = FALSE) +
     scale_fill_gradient(low = COLOR_SIG, high = COLOR_NOSIG, trans = "log10",
-                        name = "p ajustado", guide = guide_colorbar(reverse = TRUE)) +
+                        name = "adjusted p-value", guide = guide_colorbar(reverse = TRUE)) +
     scale_size_continuous(range = c(3, 10), name = "Genes",
                           guide = guide_legend(override.aes = list(shape = 24, fill = "grey40"))) +
     labs(x = "Fold enrichment", y = NULL) +

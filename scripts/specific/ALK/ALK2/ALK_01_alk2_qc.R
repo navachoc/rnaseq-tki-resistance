@@ -128,7 +128,7 @@ p_dist <- ggplot(df_dist, aes(Sample, Expression, fill = Condition)) +
   geom_violin(alpha = 0.7) +
   geom_boxplot(width = 0.1, alpha = 0.5, outlier.shape = NA) +
   scale_fill_manual(values = condition_colors) +
-  labs(title = paste("Distribución log2CPM —", OUT_PREFIX),
+  labs(title = paste("log2CPM distribution —", OUT_PREFIX),
        y = "log2CPM", x = NULL) +
   theme_minimal(base_size = 12) +
   theme(axis.text.x   = element_text(angle = 45, hjust = 1),
@@ -268,15 +268,15 @@ sink(file.path(RESULTS_DIR, "report", "01_qc_report.md"))
 tryCatch({
   cat("================================================================\n")
   cat("QC REPORT —", OUT_PREFIX, "\n")
-cat("Fecha:", as.character(Sys.time()), "\n")
+cat("Date:", as.character(Sys.time()), "\n")
 cat("================================================================\n\n")
-cat("PROCESAMIENTO:\n")
-cat("  • Genes iniciales:", genes_before, "\n")
-cat("  • Genes tras filtro (MIN_COUNT =", MIN_COUNT, "):", nrow(mat), "\n")
-cat("  • Retenidos:", retention_pct, "%\n")
-cat("  • Muestras:", ncol(mat), "\n\n")
-cat("CALIDAD POR MUESTRA:\n")
-cat(sprintf("  %-20s %12s %18s %12s\n", "Muestra", "Reads", "Mediana log2CPM", "TMM factor"))
+cat("PROCESSING:\n")
+cat("  • Initial genes:", genes_before, "\n")
+cat("  • Genes after filter (MIN_COUNT =", MIN_COUNT, "):", nrow(mat), "\n")
+cat("  • Retained:", retention_pct, "%\n")
+cat("  • Samples:", ncol(mat), "\n\n")
+cat("QUALITY PER SAMPLE:\n")
+cat(sprintf("  %-20s %12s %18s %12s\n", "Sample", "Reads", "Median log2CPM", "TMM factor"))
 for (s in names(total_reads)) {
   cat(sprintf("  %-20s %12d %18.2f %12.3f\n",
               s, total_reads[s], med_expr[s], tmm_factors[s]))
@@ -284,12 +284,12 @@ for (s in names(total_reads)) {
 cat("\n")
 cat("PCA (top", TOP_N_PCA, "genes):\n")
 cat("  • PC1:", var_pc1, "% | PC2:", var_pc2, "%\n\n")
-cat("GENES CORE (alk_resistance_core) EN TOP", TOP_N_HEATMAP, ":\n")
-cat(" ", if (length(core_in_top_heatmap) > 0) paste(core_in_top_heatmap, collapse = ", ") else "Ninguno", "\n\n")
-cat("PARA INTERPRETACIÓN:\n")
-cat("  1. 01_pca_top", TOP_N_PCA, ".png      — ¿Separación parental vs resistencia?\n", sep = "")
-cat("  2. 01_sample_distances.png — ¿Agrupamiento coherente?\n")
-cat("  3. 01_heatmap_top", TOP_N_HEATMAP, ".png  — ¿Patrones de expresión claros?\n", sep = "")
+cat("CORE GENES (alk_resistance_core) IN TOP", TOP_N_HEATMAP, ":\n")
+cat(" ", if (length(core_in_top_heatmap) > 0) paste(core_in_top_heatmap, collapse = ", ") else "None", "\n\n")
+cat("FOR INTERPRETATION:\n")
+cat("  1. 01_pca_top", TOP_N_PCA, ".png      — Separation of parental vs resistance?\n", sep = "")
+cat("  2. 01_sample_distances.png — Coherent clustering?\n")
+cat("  3. 01_heatmap_top", TOP_N_HEATMAP, ".png  — Clear expression patterns?\n", sep = "")
 }, finally = sink())
 
 cat("Report: report/01_qc_report.md\n\n")

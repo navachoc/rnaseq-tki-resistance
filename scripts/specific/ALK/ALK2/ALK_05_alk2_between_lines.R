@@ -119,11 +119,11 @@ dist_mat <- as.matrix(dist(t(mat_res)))
 ann_res  <- metadata_unit[resistant, c("Condition", "Treatment"), drop = FALSE]
 # IC50 group as an additional annotation -- useful to see whether the clustering
 # already separates by phenotype before looking at any specific gene
-ann_res$Grupo_IC50 <- sapply(rownames(ann_res), function(m) {
-  if (m %in% GRUPOS_IC50$IC50_desplazado) "Desplazado" else "Sin_desplazar"
+ann_res$IC50_Group <- sapply(rownames(ann_res), function(m) {
+  if (m %in% GRUPOS_IC50$IC50_desplazado) "Shifted" else "Unshifted"
 })
 ann_colors_res <- filter_annotation_colors(ann_res[, c("Condition", "Treatment"), drop = FALSE])
-ann_colors_res$Grupo_IC50 <- c(Desplazado = "#2ecc71", Sin_desplazar = "#e74c3c")
+ann_colors_res$IC50_Group <- c(Shifted = "#2ecc71", Unshifted = "#e74c3c")
 
 ph_dist <- pheatmap(dist_mat,
          clustering_distance_rows = as.dist(dist_mat),
@@ -131,13 +131,13 @@ ph_dist <- pheatmap(dist_mat,
          color          = heatmap_expr,
          annotation_col = ann_res,
          annotation_colors = ann_colors_res,
-         main           = paste("Distancias entre líneas resistentes —", OUT_PREFIX),
+         main           = paste("Distances between resistant lines —", OUT_PREFIX),
          silent         = TRUE)
 grid::grid.newpage()
 grid::grid.draw(ph_dist$gtable)
 save_pheatmap(ph_dist, file.path(RESULTS_DIR, "figures", "05_distances_between_lines.png"),
               width = 6.5, height = 5.5)
-cat("  → 05_distances_between_lines.png (with Grupo_IC50 annotation)\n\n")
+cat("  → 05_distances_between_lines.png (with IC50_Group annotation)\n\n")
 
 # STEP 2: LFC PER LINE (Li vs mean of the others) ----------------------------
 cat("3. LFC per line (Li vs mean of the other", length(resistant) - 1, "resistant)...\n")
@@ -173,7 +173,7 @@ distinctive <- lfc_per_line %>%
   ungroup() %>%
   arrange(Model, desc(abs(LFC_vs_otras)))
 
-write.csv(distinctive, file.path(RESULTS_DIR, "tables", "05_genes_distintivos_por_linea.csv"), row.names = FALSE)
+write.csv(distinctive, file.path(RESULTS_DIR, "tables", "05_distinctive_genes_per_line.csv"), row.names = FALSE)
 cat("  Distinctive genes of a single line (not shared):", nrow(distinctive), "\n")
 for (li in resistant) {
   n_li <- sum(distinctive$Model == li)
@@ -186,7 +186,7 @@ distinctive_core <- distinctive %>% filter(Gene %in% alk_resistance_core)
 distinctive_wes  <- distinctive %>% filter(Gene %in% wes_panel_alk)
 cat("  alk_resistance_core:", paste0(distinctive_core$Gene, " [", distinctive_core$Model, "]", collapse = ", "), "\n")
 cat("  wes_panel_alk:      ", paste0(distinctive_wes$Gene,  " [", distinctive_wes$Model,  "]", collapse = ", "), "\n\n")
-write.csv(distinctive_wes, file.path(RESULTS_DIR, "tables", "05_genes_distintivos_wes_panel.csv"), row.names = FALSE)
+write.csv(distinctive_wes, file.path(RESULTS_DIR, "tables", "05_distinctive_genes_wes_panel.csv"), row.names = FALSE)
 
 # STEP 3: PAIRED SCATTERS BETWEEN ALL LINES ----------------------------
 cat("5. Paired scatters between lines (", choose(length(resistant), 2), "pairs )...\n")
@@ -211,7 +211,7 @@ for (par in pares) {
     geom_text_repel(aes(label = label), size = 2.5, max.overlaps = 20,
                     segment.size = 0.2, box.padding = 0.3, color = "#e67e22", seed = 1) +
     labs(
-      title = paste0("Expresión ", a, " vs ", b, " — ", OUT_PREFIX),
+      title = paste0("Expression ", a, " vs ", b, " — ", OUT_PREFIX),
       subtitle = paste("Pearson r =", r_val),
       x = paste("log2CPM —", a), y = paste("log2CPM —", b)
     ) +
@@ -246,13 +246,13 @@ ph_var <- pheatmap(z_mat,
          cluster_rows      = TRUE,
          cluster_cols      = TRUE,
          clustering_method = "ward.D2",
-         main = paste0("Top ", length(top_var), " genes más variables entre líneas + forzados — ", OUT_PREFIX),
+         main = paste0("Top ", length(top_var), " most variable genes between lines + forced — ", OUT_PREFIX),
          silent = TRUE)
 grid::grid.newpage()
 grid::grid.draw(ph_var$gtable)
-save_pheatmap(ph_var, file.path(RESULTS_DIR, "figures", "05_heatmap_variables_entre_lineas.png"),
+save_pheatmap(ph_var, file.path(RESULTS_DIR, "figures", "05_heatmap_variable_between_lines.png"),
               width = 8, height = 10)
-cat("  → 05_heatmap_variables_entre_lineas.png (", length(genes_hm), "genes)\n\n")
+cat("  → 05_heatmap_variable_between_lines.png (", length(genes_hm), "genes)\n\n")
 
 # ==============================================================================
 # STEP 5 (ALK2-SPECIFIC): IC50 GROUP COMPARISON
@@ -264,8 +264,8 @@ cat("7. IC50 group comparison (L1/L4/L5 vs L2/L3)...\n")
 
 grp_A <- GRUPOS_IC50$IC50_desplazado
 grp_B <- GRUPOS_IC50$IC50_sin_desplazar
-cat("  IC50 desplazado (", paste(grp_A, collapse = ", "), ") vs ",
-    "IC50 sin desplazar (", paste(grp_B, collapse = ", "), ")\n", sep = "")
+cat("  Shifted IC50 (", paste(grp_A, collapse = ", "), ") vs ",
+    "Unshifted IC50 (", paste(grp_B, collapse = ", "), ")\n", sep = "")
 
 expr_A <- if (length(grp_A) > 1) rowMeans(mat_res[, grp_A]) else mat_res[, grp_A]
 expr_B <- if (length(grp_B) > 1) rowMeans(mat_res[, grp_B]) else mat_res[, grp_B]
@@ -278,7 +278,7 @@ grupo_table <- tibble::tibble(
   LFC_Desplazado_vs_SinDesplazar = lfc_grupo,
   Classification    = classify_lfc(lfc_grupo, LOGFC_THRESHOLD)
 )
-write.csv(grupo_table, file.path(RESULTS_DIR, "tables", "05_lfc_grupo_ic50.csv"), row.names = FALSE)
+write.csv(grupo_table, file.path(RESULTS_DIR, "tables", "05_lfc_ic50_group.csv"), row.names = FALSE)
 
 tab_grupo <- table(grupo_table$Classification)
 cat("  Distribution:\n")
@@ -294,10 +294,10 @@ grupo_core_down <- intersect(grupo_down$Gene, alk_resistance_core)
 grupo_wes_up    <- intersect(grupo_up$Gene,   wes_panel_alk)
 grupo_wes_down  <- intersect(grupo_down$Gene, wes_panel_alk)
 
-cat("  alk_resistance_core — higher in Desplazado:", paste(grupo_core_up, collapse = ", "), "\n")
-cat("  alk_resistance_core — higher in Sin_desplazar:", paste(grupo_core_down, collapse = ", "), "\n")
-cat("  wes_panel_alk — higher in Desplazado:", paste(grupo_wes_up, collapse = ", "), "\n")
-cat("  wes_panel_alk — higher in Sin_desplazar:", paste(grupo_wes_down, collapse = ", "), "\n\n")
+cat("  alk_resistance_core — higher in Shifted:", paste(grupo_core_up, collapse = ", "), "\n")
+cat("  alk_resistance_core — higher in Unshifted:", paste(grupo_core_down, collapse = ", "), "\n")
+cat("  wes_panel_alk — higher in Shifted:", paste(grupo_wes_up, collapse = ", "), "\n")
+cat("  wes_panel_alk — higher in Unshifted:", paste(grupo_wes_down, collapse = ", "), "\n\n")
 
 # Heatmap: top genes separating the 2 groups + forced
 top_grupo_up   <- head(grupo_up$Gene, TOP_N_GRUPO / 2)
@@ -318,14 +318,14 @@ if (length(genes_grupo) >= 2) {
            cluster_rows      = TRUE,
            cluster_cols      = FALSE,
            clustering_method = "ward.D2",
-           main = paste0("IC50 desplazado (L1/L4/L5) vs sin desplazar (L2/L3) — ", OUT_PREFIX,
-                         " (", length(top_grupo_up), " up / ", length(top_grupo_down), " down + forzados)"),
+           main = paste0("Shifted IC50 (L1/L4/L5) vs unshifted (L2/L3) — ", OUT_PREFIX,
+                         " (", length(top_grupo_up), " up / ", length(top_grupo_down), " down + forced)"),
            silent = TRUE)
   grid::grid.newpage()
   grid::grid.draw(ph_grupo$gtable)
-  save_pheatmap(ph_grupo, file.path(RESULTS_DIR, "figures", "05_heatmap_grupo_ic50.png"),
+  save_pheatmap(ph_grupo, file.path(RESULTS_DIR, "figures", "05_heatmap_ic50_group.png"),
                 width = 8, height = 10)
-  cat("  → 05_heatmap_grupo_ic50.png (", length(genes_grupo), "genes,",
+  cat("  → 05_heatmap_ic50_group.png (", length(genes_grupo), "genes,",
       length(top_grupo_up), "up /", length(top_grupo_down), "down)\n\n")
 } else {
   cat("  Fewer than 2 genes distinguish the groups — heatmap skipped\n\n")
@@ -335,43 +335,43 @@ if (length(genes_grupo) >= 2) {
 cat("8. Generating report...\n")
 
 report_text <- paste0(
-  "# Comparación entre líneas resistentes — ", OUT_PREFIX, "\n\n",
-  "**Pregunta 1:** ¿en qué se diferencian L1-L5 entre sí, más allá de lo que todas comparten frente a la parental/tratada?\n",
-  "**Pregunta 2 (específica ALK2):** ¿qué distingue a L1/L4/L5 (IC50 desplazado, resistencia real por MTT) de L2/L3 ",
-  "(toleraron el fármaco pero sin desplazamiento de IC50)?\n",
-  "**Método:** LFC directo (sin réplicas técnicas -> sin test estadístico formal). Threshold |LFC| >= ", LOGFC_THRESHOLD, "\n\n",
-  "## 1. Correlación entre líneas (Pearson, log2CPM)\n",
+  "# Comparison between resistant lines — ", OUT_PREFIX, "\n\n",
+  "**Question 1:** how do L1-L5 differ from each other, beyond what they all share relative to the parental/treated?\n",
+  "**Question 2 (ALK2-specific):** what distinguishes L1/L4/L5 (shifted IC50, true resistance by MTT) from L2/L3 ",
+  "(tolerated the drug but without IC50 shift)?\n",
+  "**Method:** direct LFC (no technical replicates -> no formal statistical test). Threshold |LFC| >= ", LOGFC_THRESHOLD, "\n\n",
+  "## 1. Correlation between lines (Pearson, log2CPM)\n",
   paste(capture.output(print(round(cor_mat, 3))), collapse = "\n"), "\n\n",
-  "## 2. Genes distintivos por línea individual (fuera de threshold en una sola línea)\n",
+  "## 2. Distinctive genes per individual line (outside threshold in a single line only)\n",
   paste(capture.output(print(as.data.frame(tab_per_line), row.names = FALSE)), collapse = "\n"), "\n",
-  "- Total distintivos (no compartidos entre líneas): ", nrow(distinctive), "\n\n",
-  "## 3. Cruce genes distintivos por línea con paneles curados\n",
+  "- Total distinctive (not shared between lines): ", nrow(distinctive), "\n\n",
+  "## 3. Overlap of per-line distinctive genes with curated panels\n",
   "- alk_resistance_core: ", if (nrow(distinctive_core) > 0)
-    paste0(distinctive_core$Gene, " [", distinctive_core$Model, "]", collapse = ", ") else "ninguno", "\n",
+    paste0(distinctive_core$Gene, " [", distinctive_core$Model, "]", collapse = ", ") else "none", "\n",
   "- wes_panel_alk: ", if (nrow(distinctive_wes) > 0)
-    paste0(distinctive_wes$Gene, " [", distinctive_wes$Model, "]", collapse = ", ") else "ninguno", "\n\n",
-  "## 4. Comparación por grupo IC50 (L1/L4/L5 vs L2/L3)\n",
-  "- Upregulated en Desplazado: ", tab_grupo["Upregulated"], " | Downregulated: ", tab_grupo["Downregulated"], "\n",
-  "- alk_resistance_core más alto en Desplazado: ", if (length(grupo_core_up) > 0) paste(grupo_core_up, collapse = ", ") else "ninguno", "\n",
-  "- alk_resistance_core más alto en Sin_desplazar: ", if (length(grupo_core_down) > 0) paste(grupo_core_down, collapse = ", ") else "ninguno", "\n",
-  "- wes_panel_alk más alto en Desplazado: ", if (length(grupo_wes_up) > 0) paste(grupo_wes_up, collapse = ", ") else "ninguno", "\n",
-  "- wes_panel_alk más alto en Sin_desplazar: ", if (length(grupo_wes_down) > 0) paste(grupo_wes_down, collapse = ", ") else "ninguno", "\n",
-  "- Ver 05_lfc_grupo_ic50.csv para la tabla completa\n\n",
-  "## Genes forzados\n",
-  "- ", paste(FORCED_GENES, collapse = ", "), " — siempre incluidos en ambos heatmaps y etiquetados en los scatters\n\n",
-  "## Tablas\n",
+    paste0(distinctive_wes$Gene, " [", distinctive_wes$Model, "]", collapse = ", ") else "none", "\n\n",
+  "## 4. Comparison by IC50 group (L1/L4/L5 vs L2/L3)\n",
+  "- Upregulated in Shifted: ", tab_grupo["Upregulated"], " | Downregulated: ", tab_grupo["Downregulated"], "\n",
+  "- alk_resistance_core higher in Shifted: ", if (length(grupo_core_up) > 0) paste(grupo_core_up, collapse = ", ") else "none", "\n",
+  "- alk_resistance_core higher in Unshifted: ", if (length(grupo_core_down) > 0) paste(grupo_core_down, collapse = ", ") else "none", "\n",
+  "- wes_panel_alk higher in Shifted: ", if (length(grupo_wes_up) > 0) paste(grupo_wes_up, collapse = ", ") else "none", "\n",
+  "- wes_panel_alk higher in Unshifted: ", if (length(grupo_wes_down) > 0) paste(grupo_wes_down, collapse = ", ") else "none", "\n",
+  "- See 05_lfc_ic50_group.csv for the full table\n\n",
+  "## Forced genes\n",
+  "- ", paste(FORCED_GENES, collapse = ", "), " — always included in both heatmaps and labelled in the scatters\n\n",
+  "## Tables\n",
   "- 05_correlation_between_lines.csv\n",
-  "- 05_lfc_per_line.csv (LFC de cada línea vs media de las otras 4)\n",
-  "- 05_genes_distintivos_por_linea.csv (solo genes exclusivos de 1 línea)\n",
-  "- 05_genes_distintivos_wes_panel.csv\n",
-  "- 05_lfc_grupo_ic50.csv (L1/L4/L5 vs L2/L3, tabla completa)\n\n",
-  "## Figuras\n",
-  "- 05_distances_between_lines.png (con anotación Grupo_IC50)\n",
+  "- 05_lfc_per_line.csv (LFC of each line vs mean of the other 4)\n",
+  "- 05_distinctive_genes_per_line.csv (only genes exclusive to 1 line)\n",
+  "- 05_distinctive_genes_wes_panel.csv\n",
+  "- 05_lfc_ic50_group.csv (L1/L4/L5 vs L2/L3, full table)\n\n",
+  "## Figures\n",
+  "- 05_distances_between_lines.png (with IC50_Group annotation)\n",
   paste(paste0("- 05_scatter_", sapply(pares, `[`, 1), "_vs_", sapply(pares, `[`, 2), ".png\n"), collapse = ""),
-  "- 05_heatmap_variables_entre_lineas.png (top ", length(top_var), " por varianza + ",
-  paste(FORCED_GENES, collapse = "/"), " forzados)\n",
-  "- 05_heatmap_grupo_ic50.png (L1/L4/L5 vs L2/L3, top ", length(top_grupo_up), " up + top ",
-  length(top_grupo_down), " down + forzados)\n"
+  "- 05_heatmap_variable_between_lines.png (top ", length(top_var), " by variance + ",
+  paste(FORCED_GENES, collapse = "/"), " forced)\n",
+  "- 05_heatmap_ic50_group.png (L1/L4/L5 vs L2/L3, top ", length(top_grupo_up), " up + top ",
+  length(top_grupo_down), " down + forced)\n"
 )
 writeLines(report_text, file.path(RESULTS_DIR, "report", "05_between_lines_report.md"))
 cat("Report: report/05_between_lines_report.md\n\n")

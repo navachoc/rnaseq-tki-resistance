@@ -215,9 +215,9 @@ if (length(sig_genes) >= 3) {
            show_colnames     = TRUE,
            fontsize_row      = 7,
            fontsize_col      = 9,
-           main = paste0(sig_prefix, " resistance signature — top50 por fármaco (unión) — ", OUT_PREFIX,
+           main = paste0(sig_prefix, " resistance signature — top50 per drug (union) — ", OUT_PREFIX,
                          " (", length(sig_genes), " genes + ",
-                         length(forced_in_mat), " forzados: ",
+                         length(forced_in_mat), " forced: ",
                          paste(forced_in_mat, collapse = ","), ")"),
            silent = TRUE)
 
@@ -254,16 +254,16 @@ if (length(genes_wes_filtrado_forced) >= 2) {
            cluster_rows      = TRUE,
            cluster_cols      = TRUE,
            clustering_method = "ward.D2",
-           main = paste0("WES curated panel (wes_panel_alk) — filtrado |LFC| >= threshold — ",
+           main = paste0("WES curated panel (wes_panel_alk) — filtered |LFC| >= threshold — ",
                          OUT_PREFIX, " (", length(genes_wes_filtrado_forced), " genes)"),
            silent = TRUE)
 
   grid::grid.newpage()
   grid::grid.draw(ph_wes$gtable)
   save_pheatmap(ph_wes,
-                file.path(RESULTS_DIR, "figures", "03_heatmap_wes_panel_filtrado.png"),
+                file.path(RESULTS_DIR, "figures", "03_heatmap_wes_panel_filtered.png"),
                 width = 10, height = 8)
-  cat("  → 03_heatmap_wes_panel_filtrado.png (", length(genes_wes_filtrado_forced), "genes)\n\n")
+  cat("  → 03_heatmap_wes_panel_filtered.png (", length(genes_wes_filtrado_forced), "genes)\n\n")
 } else {
   cat("  Fewer than 2 WES panel genes pass the filter — heatmap skipped\n\n")
 }
@@ -303,7 +303,7 @@ if (length(vis_genes) > 0) {
     facet_wrap(~ Gene, scales = "free_y", ncol = 5) +
     labs(
       title    = paste("Expression per sample —", OUT_PREFIX),
-      subtitle = paste0("Forzados: ", paste(FORCED_GENES[FORCED_GENES %in% rownames(mat)], collapse = ", "),
+      subtitle = paste0("Forced: ", paste(FORCED_GENES[FORCED_GENES %in% rownames(mat)], collapse = ", "),
                        " | Top Upregulated: ", paste(top5_up, collapse = ", "),
                        " | Top Downregulated: ", paste(top5_down, collapse = ", ")),
       x = NULL, y = "log2CPM (TMM)"
@@ -362,7 +362,7 @@ if (length(vis_genes) > 0) {
     scale_color_manual(values = DRUG_COLORS_ALK) +
     labs(
       title    = paste("Key gene expression per resistant model —", OUT_PREFIX),
-      subtitle = "Líneas punteadas = nivel Treated de cada fármaco (ALK3_L / ALK3_A)",
+      subtitle = "Dashed lines = Treated level of each drug (ALK3_L / ALK3_A)",
       x = NULL, y = "log2CPM (TMM)"
     ) +
     theme_minimal(base_size = 10) +
@@ -387,43 +387,43 @@ cat("7. Generating report...\n")
 
 report_text <- paste0(
   "# Key Genes Report — ", OUT_PREFIX, "\n\n",
-  "**Firma:** data-driven (sin lista de genes conocida) — Upregulated + Downregulated, ",
-  "calculada por separado para Lorlatinib y Alectinib (tabla larga, columna Drug)\n\n",
-  "## Top 15 Upregulated (ambos fármacos, ordenado por LFC)\n",
+  "**Signature:** data-driven (no known gene list) — Upregulated + Downregulated, ",
+  "computed separately for Lorlatinib and Alectinib (long table, Drug column)\n\n",
+  "## Top 15 Upregulated (both drugs, ordered by LFC)\n",
   paste(capture.output(print(
     as.data.frame(up_genes %>% slice_head(n = 15) %>%
                     dplyr::select(Gene, Drug, LFC_Res_vs_Trt, Ya_Elevado_en_Treated)),
     row.names = FALSE)), collapse = "\n"), "\n\n",
-  "## alk_resistance_core detectados\n",
+  "## alk_resistance_core detected\n",
   "- Upregulated:  ", paste(unique(core_up),   collapse = ", "), "\n",
   "- Downregulated:", paste(unique(core_down), collapse = ", "), "\n\n",
-  "## wes_panel_alk detectados (mismo panel curado de SNV/CNV/LOH)\n",
+  "## wes_panel_alk detected (same curated SNV/CNV/LOH panel)\n",
   "- Upregulated:  ", paste(unique(wes_up),   collapse = ", "), "\n",
   "- Downregulated:", paste(unique(wes_down), collapse = ", "), "\n",
-  "- Ver también: ", paste0(sig_prefix, "_signature_wes_panel_overlap.csv"), " y 02_convergencia_farmacos.csv\n\n",
-  paste0("## Firma ", sig_prefix, "_resistance_signature_conservative.csv\n"),
-  "- N filas: ", nrow(signature_cons), " (",
+  "- See also: ", paste0(sig_prefix, "_signature_wes_panel_overlap.csv"), " and 02_drug_convergence.csv\n\n",
+  paste0("## Signature ", sig_prefix, "_resistance_signature_conservative.csv\n"),
+  "- N rows: ", nrow(signature_cons), " (",
   sum(signature_cons$Classification == "Upregulated"), " up / ",
   sum(signature_cons$Classification == "Downregulated"), " down)\n\n",
-  "## Genes forzados (fusión driver)\n",
-  "- ", paste(FORCED_GENES, collapse = ", "), " — siempre incluidos en la firma (ambos fármacos), el heatmap y ",
-  "el stripplot/lineplot, pasen o no el filtro de LFC\n",
+  "## Forced genes (driver fusion)\n",
+  "- ", paste(FORCED_GENES, collapse = ", "), " — always included in the signature (both drugs), the heatmap and ",
+  "the stripplot/lineplot, whether or not they pass the LFC filter\n",
   if (nrow(forced_df) > 0)
-    paste0("- Clasificación real (fuera de threshold): ",
+    paste0("- Actual classification (outside threshold): ",
            paste0(forced_df$Gene, " [", forced_df$Drug, ": ", forced_df$Classification, "]", collapse = ", "), "\n")
-  else "- Ambos superan threshold de forma natural en ambos fármacos (ya incluidos sin forzar)\n",
+  else "- Both pass the threshold naturally in both drugs (already included without forcing)\n",
   "\n",
-  "## Genes stripplot/lineplot (forzados + top LFC combinado)\n",
-  "- Forzados:          ", paste(FORCED_GENES[FORCED_GENES %in% rownames(mat)], collapse = ", "), "\n",
+  "## Stripplot/lineplot genes (forced + combined top LFC)\n",
+  "- Forced:          ", paste(FORCED_GENES[FORCED_GENES %in% rownames(mat)], collapse = ", "), "\n",
   "- Top5 Upregulated:  ", paste(top5_up,   collapse = ", "), "\n",
   "- Top5 Downregulated:", paste(top5_down, collapse = ", "), "\n\n",
-  "## Figuras\n",
-  "- 03_heatmap_signature.png   — firma completa (unión top25 up + top25 down por fármaco + ",
-  paste(FORCED_GENES, collapse = "/"), " forzados; gradiente negro-gris-dorado; anotado por Drug)\n",
-  "- 03_heatmap_wes_panel_filtrado.png — wes_panel_alk ∩ firma (", length(genes_wes_filtrado),
-  " genes) + ", paste(FORCED_GENES, collapse = "/"), " forzados\n",
-  "- 03_stripplot_key_genes.png — expresión por muestra (forma = fármaco)\n",
-  "- 03_lineplot_key_genes.png  — trayectoria por modelo resistente vs nivel Treated de SU fármaco\n"
+  "## Figures\n",
+  "- 03_heatmap_signature.png   — full signature (union of top25 up + top25 down per drug + ",
+  paste(FORCED_GENES, collapse = "/"), " forced; black-grey-gold gradient; annotated by Drug)\n",
+  "- 03_heatmap_wes_panel_filtered.png — wes_panel_alk ∩ signature (", length(genes_wes_filtrado),
+  " genes) + ", paste(FORCED_GENES, collapse = "/"), " forced\n",
+  "- 03_stripplot_key_genes.png — expression per sample (shape = drug)\n",
+  "- 03_lineplot_key_genes.png  — trajectory per resistant model vs Treated level of ITS drug\n"
 )
 
 writeLines(report_text, file.path(RESULTS_DIR, "report", "03_key_genes_report.md"))

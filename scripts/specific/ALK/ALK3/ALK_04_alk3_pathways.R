@@ -108,13 +108,13 @@ run_enrichment <- function(gene_symbols, label, results_dir, top_n, drug_tag) {
 
 extract_top <- function(res, type = "go", n = 10) {
   obj <- res[[type]]
-  if (is.null(obj) || nrow(obj@result) == 0) return("Sin resultados significativos")
+  if (is.null(obj) || nrow(obj@result) == 0) return("No significant results")
   top <- head(obj@result %>% arrange(p.adjust) %>%
                 dplyr::select(Description, p.adjust, Count), n)
   paste(capture.output(print(top, row.names = FALSE)), collapse = "\n")
 }
 extract_top_gsea <- function(res, n = 10) {
-  if (is.null(res) || nrow(res@result) == 0) return("Sin resultados significativos")
+  if (is.null(res) || nrow(res@result) == 0) return("No significant results")
   top <- head(res@result %>% arrange(p.adjust) %>%
                 dplyr::select(Description, NES, p.adjust), n)
   paste(capture.output(print(top, row.names = FALSE)), collapse = "\n")
@@ -262,9 +262,9 @@ report_drug_section <- function(drug) {
     "## ", drug, "\n\n",
     "### ORA GO BP — ", r$up_label, " (top 10)\n", extract_top(r$res_up, "go", 10), "\n\n",
     "### ORA KEGG — ", r$up_label, " (top 10)\n", extract_top(r$res_up, "kegg", 10), "\n\n",
-    "### GSEA GO BP (top 10 por p.adjust)\n", extract_top_gsea(r$res_gsea_go, 10), "\n\n",
-    "### GSEA KEGG (top 10 por p.adjust)\n", extract_top_gsea(r$res_gsea_kegg, 10), "\n\n",
-    "### Figuras (", drug, ")\n",
+    "### GSEA GO BP (top 10 by p.adjust)\n", extract_top_gsea(r$res_gsea_go, 10), "\n\n",
+    "### GSEA KEGG (top 10 by p.adjust)\n", extract_top_gsea(r$res_gsea_kegg, 10), "\n\n",
+    "### Figures (", drug, ")\n",
     "- 04_go_bp_", tolower(gsub(" ", "_", r$up_label)), "_", r$drug_tag_lc, ".png\n",
     "- 04_kegg_", tolower(gsub(" ", "_", r$up_label)), "_", r$drug_tag_lc, ".png\n",
     if (r$has_down) paste0("- 04_go_bp_downregulated_", r$drug_tag_lc, ".png\n- 04_kegg_downregulated_", r$drug_tag_lc, ".png\n") else "",
@@ -278,8 +278,8 @@ report_drug_section <- function(drug) {
 
 report_text <- paste0(
   "# Pathways Report — ", OUT_PREFIX, "\n\n",
-  "Enriquecimiento funcional calculado por separado para Lorlatinib y Alectinib ",
-  "(cada fármaco compara sus resistentes contra su propia parental treated).\n\n",
+  "Functional enrichment computed separately for Lorlatinib and Alectinib ",
+  "(each drug compares its resistant lines against its own treated parental).\n\n",
   report_drug_section("Lorlatinib"),
   report_drug_section("Alectinib")
 )

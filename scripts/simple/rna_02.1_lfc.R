@@ -413,22 +413,22 @@ if (DATASET %in% TWO_CLASS_DATASETS) {
 
   report_text <- paste0(
     "# LFC Report — ", OUT_PREFIX, "\n\n",
-    "**Threshold:** |LFC| ≥ ", LOGFC_THRESHOLD, " (clasificación simplificada: sin muestra tratada)\n\n",
-    "## Clasificación\n",
-    "| Clase | N | % |\n",
+    "**Threshold:** |LFC| ≥ ", LOGFC_THRESHOLD, " (simplified classification: no treated sample)\n\n",
+    "## Classification\n",
+    "| Class | N | % |\n",
     "|-------|---|---|\n",
     "| Upregulated | ", n_up, " | ", round(100*n_up/nrow(lfc_table),1), "% |\n",
     "| Downregulated | ", n_down, " | ", round(100*n_down/nrow(lfc_table),1), "% |\n",
     "| Other | ", nrow(lfc_table)-n_up-n_down, " | ",
     round(100*(nrow(lfc_table)-n_up-n_down)/nrow(lfc_table),1), "% |\n\n",
-    "## Top 10 Upregulated (por LFC_Res_vs_Par)\n",
+    "## Top 10 Upregulated (by LFC_Res_vs_Par)\n",
     paste(capture.output(print(as.data.frame(top10_acq), row.names = FALSE)), collapse = "\n"), "\n\n",
-    "## Top 10 Downregulated (por LFC_Res_vs_Par)\n",
+    "## Top 10 Downregulated (by LFC_Res_vs_Par)\n",
     paste(capture.output(print(as.data.frame(top10_down), row.names = FALSE)), collapse = "\n"), "\n\n",
-    "## Figuras\n",
+    "## Figures\n",
     "- 02_lfc_histogram.png\n",
-    "- 02_lfc_scatter.png (MA plot coloreado, genes clave etiquetados)\n",
-    "- 02_heatmap_classified.png (z-score por muestra, top 100 Up + top 100 Down de los genes clasificados)\n"
+    "- 02_lfc_scatter.png (colored MA plot, key genes labelled)\n",
+    "- 02_heatmap_classified.png (z-score per sample, top 100 Up + top 100 Down of the classified genes)\n"
   )
 } else {
   acq_lbl  <- unname(CLASS_LABELS["acq"])
@@ -454,22 +454,22 @@ if (DATASET %in% TWO_CLASS_DATASETS) {
   report_text <- paste0(
     "# LFC Report — ", OUT_PREFIX, "\n\n",
     "**Threshold:** |LFC| ≥ ", LOGFC_THRESHOLD, "\n\n",
-    "## Clasificación\n",
-    "| Clase | N | % |\n",
+    "## Classification\n",
+    "| Class | N | % |\n",
     "|-------|---|---|\n",
     "| ", acq_lbl, " | ", n_acq, " | ", round(100*n_acq/nrow(lfc_table),1), "% |\n",
     "| ", pre_lbl, " | ", n_pre, " | ", round(100*n_pre/nrow(lfc_table),1), "% |\n",
     "| Downregulated | ", n_down, " | ", round(100*n_down/nrow(lfc_table),1), "% |\n",
     "| ", maint_lbl, " | ", n_main, " | ", round(100*n_main/nrow(lfc_table),1), "% |\n\n",
     "**Ratio ", acq_lbl, "/", pre_lbl, ":** ", ratio,
-    " → [INTERPRETAR: ¿predomina resistencia de novo o heterogeneidad preexistente?]\n\n",
-    "## Top 10 ", acq_lbl, " (por LFC_Res_vs_Trt)\n",
+    " → [INTERPRET: does de novo resistance or pre-existing heterogeneity predominate?]\n\n",
+    "## Top 10 ", acq_lbl, " (by LFC_Res_vs_Trt)\n",
     paste(capture.output(print(as.data.frame(top10_acq), row.names = FALSE)), collapse = "\n"), "\n\n",
-    "## Top 10 Downregulated (por LFC_Res_vs_Unt)\n",
+    "## Top 10 Downregulated (by LFC_Res_vs_Unt)\n",
     paste(capture.output(print(as.data.frame(top10_down), row.names = FALSE)), collapse = "\n"), "\n\n",
-    "## Figuras\n",
+    "## Figures\n",
     "- 02_lfc_scatter.png (LFC scatter)\n",
-    "- 02_heatmap_classified.png (z-score por muestra, ordenado por LFC)\n"
+    "- 02_heatmap_classified.png (z-score per sample, ordered by LFC)\n"
   )
 }
 writeLines(report_text, file.path(RESULTS_DIR, "report", "02_lfc_report.md"))

@@ -295,12 +295,12 @@ cat("7. Generating report...\n")
 
 report_text <- paste0(
   "# Key Genes Report — ", OUT_PREFIX, "\n\n",
-  "**Firma:** data-driven, basada en d) Untreated vs Resistance (comparación completa ",
-  "basal→resistente, consistente con MET1/EGFR1_EGFRi). Columna `Resistance_specific` = TRUE ",
-  "si el gen también supera el umbral en c) Treated vs Resistance con el mismo signo ",
-  "(mismo LOGFC_THRESHOLD=", LOGFC_THRESHOLD, ") — filtra genes cuyo cambio en resistencia ",
-  "es heredado casi por completo de la respuesta aguda al fármaco (b).\n\n",
-  "**Nota:** no se genera firma para scRNA-seq — no hay datos single-cell de RET todavía.\n\n",
+  "**Signature:** data-driven, based on d) Untreated vs Resistance (full comparison ",
+  "baseline→resistant, consistent with MET1/EGFR1_EGFRi). Column `Resistance_specific` = TRUE ",
+  "if the gene also passes the threshold in c) Treated vs Resistance with the same sign ",
+  "(same LOGFC_THRESHOLD=", LOGFC_THRESHOLD, ") — filters out genes whose change in resistance ",
+  "is almost entirely inherited from the acute response to the drug (b).\n\n",
+  "**Note:** no signature is generated for scRNA-seq — there is no RET single-cell data yet.\n\n",
   "## Top 15 Upregulated (d)\n",
   paste(capture.output(print(
     as.data.frame(slice_head(up_genes, n = 15) %>%
@@ -311,19 +311,19 @@ report_text <- paste0(
     as.data.frame(slice_head(down_genes, n = 15) %>%
                     dplyr::select(Gene, LFC_Unt_vs_Res_comb, Resistance_specific)),
     row.names = FALSE)), collapse = "\n"), "\n\n",
-  "## Firma ", RECEPTOR, "_resistance_signature_conservative.csv\n",
+  "## Signature ", RECEPTOR, "_resistance_signature_conservative.csv\n",
   "- N genes: ", nrow(signature_cons), " (",
   sum(signature_cons$Classification == "Upregulated"), " up / ",
   sum(signature_cons$Classification == "Downregulated"), " down / ",
   sum(signature_cons$Resistance_specific), " Resistance_specific)\n\n",
-  "## Genes stripplot (top", TOP_N_VIS, "por LFC d, sin lista conocida)\n",
+  "## Genes stripplot (top", TOP_N_VIS, "by LFC d, no known list)\n",
   "- Top", TOP_N_VIS, " Up:  ", paste(vis_up,   collapse = ", "), "\n",
   "- Top", TOP_N_VIS, " Down:", paste(vis_down, collapse = ", "), "\n\n",
-  "## Figuras\n",
-  "- 03b_heatmap_d_signature.png — firma d) top", TOP_N_HEATMAP, " up + top", TOP_N_HEATMAP,
-  " down, anotada con Resistance_specific (corroboración en c)\n",
-  "- 03b_stripplot_key_genes.png — expresión por muestra (top", TOP_N_VIS, " up/down de d)\n\n",
-  "**Panel WES/scDNA/SNV:** ver rna_03c.1_wes_panel_combined.R (heatmaps + stripplots CNV/SNV)\n"
+  "## Figures\n",
+  "- 03b_heatmap_d_signature.png — signature d) top", TOP_N_HEATMAP, " up + top", TOP_N_HEATMAP,
+  " down, annotated with Resistance_specific (corroboration in c)\n",
+  "- 03b_stripplot_key_genes.png — expression per sample (top", TOP_N_VIS, " up/down of d)\n\n",
+  "**WES/scDNA/SNV panel:** see rna_03c.1_wes_panel_combined.R (heatmaps + CNV/SNV stripplots)\n"
 )
 
 writeLines(report_text, file.path(RESULTS_DIR, "report", "03b_key_genes_report.md"))

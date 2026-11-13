@@ -66,7 +66,7 @@
 #   ALK_12_fig2_lfc_heatmap_ALK1.png
 #   ALK_12_fig2_lfc_heatmap_ALK2.png
 #   ALK_12_fig2_lfc_heatmap_ALK3.png
-#   ALK_12_fig2_lfc_heatmap_combinado.png   (the 3 side by side, quick reference)
+#   ALK_12_fig2_lfc_heatmap_combined.png   (the 3 side by side, quick reference)
 #   ALK_12_fig2_lfc_heatmap_<model>_gene_order.csv (row order after clustering)
 #   ALK_12_fig2_lfc_heatmap_pie.txt (figure caption text)
 #
@@ -327,14 +327,14 @@ resultados <- list(ALK1 = res_alk1, ALK2 = res_alk2, ALK3 = res_alk3)
 # parental IS (unlike the resistant lines, it does not take part in
 # the Top LFC ranking, it is only shown as a context column).
 PIE_FIGURA <- paste0(
-  "LFC de cada columna (parental tratada de forma aguda + lineas resistentes) frente a la parental sin tratar del mismo modelo ",
-  "(comparacion 1:1 por muestra, no promedio del grupo). La parental sin tratar no se muestra como columna: por definicion su LFC ",
-  "frente a si misma seria 0 en todas las filas. La parental tratada SI se muestra (columna 'Treated', o 'Treated_L'/'Treated_A' en ",
-  "ALK3 segun farmaco) pero no participa en la seleccion de genes Top LFC, solo aporta contexto de la respuesta aguda pre-resistencia. ",
-  "Escala de color fija de -", LFC_MAX, " a ", LFC_MAX, ": los genes con |LFC|>", LFC_MAX, " (criterio de seleccion del bloque Top LFC) saturan al color extremo. ",
-  "Categoria 'Top LFC': ", TOP_N_LFC, " genes mas sobreexpresados + ", TOP_N_LFC, " mas infraexpresados por magnitud de LFC entre las lineas resistentes de ese modelo ",
-  "(con 1 gen extra en ALK1 y ALK2 para compensar que APOBEC3A no esta cuantificado en sus matrices TMM). ",
-  "Categoria 'WES/Receptor panel': panel fijo de ", length(GENES_WES_RECEPTORES), " genes (", paste(GENES_WES_RECEPTORES, collapse = ", "), ")."
+  "LFC of each column (acutely treated parental + resistant lines) relative to the untreated parental of the same model ",
+  "(1:1 comparison per sample, not a group average). The untreated parental is not shown as a column: by definition its LFC ",
+  "against itself would be 0 in all rows. The treated parental IS shown (column 'Treated', or 'Treated_L'/'Treated_A' in ",
+  "ALK3 depending on the drug) but does not take part in the selection of Top LFC genes, it only provides context on the acute pre-resistance response. ",
+  "Fixed color scale from -", LFC_MAX, " a ", LFC_MAX, ": genes with |LFC|>", LFC_MAX, " (selection criterion of the Top LFC block) saturate to the extreme color. ",
+  "Category 'Top LFC': ", TOP_N_LFC, " most upregulated genes + ", TOP_N_LFC, " most downregulated by LFC magnitude among the resistant lines of that model ",
+  "(with 1 extra gene in ALK1 and ALK2 to compensate for APOBEC3A not being quantified in their TMM matrices). ",
+  "Category 'WES/Receptor panel': fixed panel of ", length(GENES_WES_RECEPTORES), " genes (", paste(GENES_WES_RECEPTORES, collapse = ", "), ")."
 )
 cat("Figure caption:\n ", PIE_FIGURA, "\n\n")
 writeLines(PIE_FIGURA, file.path(OUT_DIR, "figures", "ALK_12_fig2_lfc_heatmap_pie.txt"))
@@ -382,7 +382,7 @@ leyenda_compartida <- packLegend(
   direction = "horizontal"
 )
 
-out_combinado <- file.path(OUT_DIR, "figures", "ALK_12_fig2_lfc_heatmap_combinado.png")
+out_combinado <- file.path(OUT_DIR, "figures", "ALK_12_fig2_lfc_heatmap_combined.png")
 
 # The 3 panels with the SAME width (same criterion as ALK_11) -- bottom row
 # reserved for the single shared legend.

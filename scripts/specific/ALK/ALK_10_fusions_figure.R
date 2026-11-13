@@ -4,7 +4,7 @@
 #   It does not reanalyse the fusions, it starts from the tables of
 #   ALK_08.1_*_fusions.R.
 #   Panel A -- combined EML4-ALK dotplot (3 style variants:
-#              _facetado / _patchwork / _facetado_valores)
+#              _faceted / _patchwork / _faceted_values)
 #   Panel B -- expression of ALK/EML4, the driver fusion genes of
 #              Panel A. Horizontal striplot, direct partner of A.
 #   Panel C -- striking fusions, 1 per facet, selected after reviewing the
@@ -146,7 +146,7 @@ p_fusion_facet <- ggplot(traj, aes(x = Etiqueta, y = 1, size = JunctionReadCount
   scale_size_continuous(range = c(1, 12)) +
   labs(
     title = "EML4-ALK fusion transcript level (RNA-seq) — ALK1 + ALK2 + ALK3",
-    subtitle = "EML4--ALK — facet_wrap, 1 sola leyenda (escala de color global)",
+    subtitle = "EML4--ALK — facet_wrap, single legend (global color scale)",
     x = NULL, y = NULL, color = "FFPM", size = "Junction\nreads",
     caption = paste0(
       "Untreated = parental, no drug. Treated = parental, acute drug exposure, not yet resistant. ",
@@ -166,7 +166,7 @@ p_fusion_facet <- ggplot(traj, aes(x = Etiqueta, y = 1, size = JunctionReadCount
     plot.background  = element_rect(fill = "white")
   )
 
-out_png_facet <- file.path(OUT_DIR, "figures", "ALK_10_fig3_panelA_fusion_dotplot_facetado.png")
+out_png_facet <- file.path(OUT_DIR, "figures", "ALK_10_fig3_panelA_fusion_dotplot_faceted.png")
 ggsave(out_png_facet, p_fusion_facet, width = 18, height = 4.8, dpi = 300)
 cat("  ", out_png_facet, "\n")
 
@@ -200,7 +200,7 @@ p_fusion_patchwork <- wrap_plots(paneles, nrow = 1) +
   plot_layout(widths = n_cols) +
   plot_annotation(
     title = "EML4-ALK fusion transcript level (RNA-seq) — ALK1 + ALK2 + ALK3",
-    subtitle = "EML4--ALK — patchwork, escala de color independiente por panel (propio min-max)",
+    subtitle = "EML4--ALK — patchwork, independent color scale per panel (own min-max)",
     caption = paste0(
       "Untreated = parental, no drug. Treated = parental, acute drug exposure, not yet resistant. ",
       "Remaining points = resistant lines. Source: STAR-Fusion, EML4--ALK junction."
@@ -228,7 +228,7 @@ p_fusion_facet_valores <- ggplot(traj, aes(x = Etiqueta, y = 1, size = JunctionR
   coord_cartesian(ylim = c(0.6, 1.15), clip = "off") +
   labs(
     title = "EML4-ALK fusion transcript level (RNA-seq) — ALK1 + ALK2 + ALK3",
-    subtitle = "EML4--ALK — facet_wrap, 1 sola leyenda, valores de FFPM y junction reads en texto",
+    subtitle = "EML4--ALK — facet_wrap, single legend, FFPM and junction read values as text",
     x = NULL, y = NULL, color = "FFPM", size = "Junction\nreads",
     caption = paste0(
       "Untreated = parental, no drug. Treated = parental, acute drug exposure, not yet resistant. ",
@@ -248,7 +248,7 @@ p_fusion_facet_valores <- ggplot(traj, aes(x = Etiqueta, y = 1, size = JunctionR
     plot.background  = element_rect(fill = "white")
   )
 
-out_png_facet_valores <- file.path(OUT_DIR, "figures", "ALK_10_fig3_panelA_fusion_dotplot_facetado_valores.png")
+out_png_facet_valores <- file.path(OUT_DIR, "figures", "ALK_10_fig3_panelA_fusion_dotplot_faceted_values.png")
 ggsave(out_png_facet_valores, p_fusion_facet_valores, width = 18, height = 5.4, dpi = 300)
 cat("  ", out_png_facet_valores, "\n\n")
 
@@ -303,13 +303,13 @@ panel_b_puntos <- bind_rows(lapply(levels(traj$Faceta), function(f) {
   base   <- traj %>% filter(Faceta == f) %>% distinct(Sample, Model, Faceta, Etiqueta, Stage)
   modelo <- unique(base$Model)
   bind_rows(
-    base %>% mutate(LFC = lfc_untreated("EML4", modelo, Sample), Gen = "EML4", Posicion = "Izquierda"),
-    base %>% mutate(LFC = lfc_untreated("ALK",  modelo, Sample), Gen = "ALK",  Posicion = "Derecha")
+    base %>% mutate(LFC = lfc_untreated("EML4", modelo, Sample), Gen = "EML4", Posicion = "Left"),
+    base %>% mutate(LFC = lfc_untreated("ALK",  modelo, Sample), Gen = "ALK",  Posicion = "Right")
   )
 })) %>%
   mutate(Faceta = factor(Faceta, levels = levels(traj$Faceta)))
 
-out_csv_panel_b <- file.path(OUT_DIR, "tables", "ALK_10_fig3_panelB_alk_eml4_expresion.csv")
+out_csv_panel_b <- file.path(OUT_DIR, "tables", "ALK_10_fig3_panelB_alk_eml4_expression.csv")
 write.csv(panel_b_puntos, out_csv_panel_b, row.names = FALSE)
 cat("  ", out_csv_panel_b, "\n\n")
 
@@ -329,17 +329,17 @@ p_panel_b <- ggplot(panel_b_puntos, aes(x = Etiqueta, y = LFC, color = Posicion)
   scale_y_continuous(limits = rango_panel_b + c(-margen_panel_b, margen_panel_b)) +
   facet_wrap(~ Faceta, scales = "free_x", nrow = 1) +
   # breaks set explicitly -- without this, scale_color_manual orders the
-  # levels alphabetically (Derecha before Izquierda) but matches
+  # levels alphabetically (Right before Left) but matches
   # "labels" by POSITION according to the order written in the code
-  # (Izquierda first), not by name -- each text label ended up
+  # (Left first), not by name -- each text label ended up
   # attached to the opposite level.
-  scale_color_manual(breaks = c("Izquierda", "Derecha"),
-                      values = c(Izquierda = COLOR_IZQUIERDA, Derecha = COLOR_DERECHA),
+  scale_color_manual(breaks = c("Left", "Right"),
+                      values = c(Left = COLOR_IZQUIERDA, Right = COLOR_DERECHA),
                       labels = c("EML4", "ALK")) +
   labs(
-    title = "ALK / EML4 expression — genes de la fusion driver EML4-ALK",
+    title = "ALK / EML4 expression — genes of the EML4-ALK driver fusion",
     x = NULL, y = "log2FC vs Untreated", color = NULL,
-    caption = "Striplot -- punto en su valor real de log2FC, sin linea que conecte muestras. Pareja directa del Panel A."
+    caption = "Striplot -- point at its actual log2FC value, no line connecting samples. Direct counterpart of Panel A."
   ) +
   theme_minimal(base_size = 12) +
   theme(
@@ -351,7 +351,7 @@ p_panel_b <- ggplot(panel_b_puntos, aes(x = Etiqueta, y = LFC, color = Posicion)
     panel.background = element_rect(fill = "white"), plot.background = element_rect(fill = "white")
   )
 
-out_png_panel_b <- file.path(OUT_DIR, "figures", "ALK_10_fig3_panelB_alk_eml4_expresion.png")
+out_png_panel_b <- file.path(OUT_DIR, "figures", "ALK_10_fig3_panelB_alk_eml4_expression.png")
 ggsave(out_png_panel_b, p_panel_b, width = 16, height = 5, dpi = 300)
 cat("  ", out_png_panel_b, "\n\n")
 
@@ -390,7 +390,7 @@ p_panelAB <- (p_fusion_facet +
     )
   )
 
-out_png_panelAB <- file.path(OUT_DIR, "figures", "ALK_10_fig3_panelAB_alineado.png")
+out_png_panelAB <- file.path(OUT_DIR, "figures", "ALK_10_fig3_panelAB_aligned.png")
 # width = 22in -- with 16in the spheres of Panel A (JunctionReadCount,
 # size up to 12) almost touch each other within each facet,
 # especially in ALK2/ALK3-Lorlatinib (6-7 categories).
@@ -485,7 +485,7 @@ panel_c_datos <- bind_rows(panel_c_lista) %>%
     Fusion_Label = factor(Fusion_Label, levels = paste0(FUSIONES_LLAMATIVAS$Faceta, " — ", FUSIONES_LLAMATIVAS$Etiqueta_fusion))
   )
 
-out_csv_panel_c <- file.path(OUT_DIR, "tables", "ALK_10_fig3_panelC_fusiones_llamativas.csv")
+out_csv_panel_c <- file.path(OUT_DIR, "tables", "ALK_10_fig3_panelC_striking_fusions.csv")
 write.csv(panel_c_datos, out_csv_panel_c, row.names = FALSE)
 cat("  ", out_csv_panel_c, "\n\n")
 
@@ -564,7 +564,7 @@ ht_panel_c <- Heatmap(
                                direction = "horizontal", legend_width = unit(4, "cm"))
 )
 
-out_png_panel_c <- file.path(OUT_DIR, "figures", "ALK_10_fig3_panelC_fusiones_llamativas_heatmap.png")
+out_png_panel_c <- file.path(OUT_DIR, "figures", "ALK_10_fig3_panelC_striking_fusions_heatmap.png")
 png(out_png_panel_c, width = 8, height = 11, units = "in", res = 300)
 draw(ht_panel_c, heatmap_legend_side = "bottom")
 dev.off()
@@ -590,13 +590,13 @@ ht_panel_c_sin_valores <- Heatmap(
                                direction = "horizontal", legend_width = unit(4, "cm"))
 )
 
-out_png_panel_c_sv <- file.path(OUT_DIR, "figures", "ALK_10_fig3_panelC_fusiones_llamativas_heatmap_sin_valores.png")
+out_png_panel_c_sv <- file.path(OUT_DIR, "figures", "ALK_10_fig3_panelC_striking_fusions_heatmap_no_values.png")
 png(out_png_panel_c_sv, width = 8, height = 11, units = "in", res = 300)
 draw(ht_panel_c_sin_valores, heatmap_legend_side = "bottom")
 dev.off()
 cat("  ", out_png_panel_c_sv, "\n\n")
 
-out_csv_panel_c_mat <- file.path(OUT_DIR, "tables", "ALK_10_fig3_panelC_matriz_ffpm.csv")
+out_csv_panel_c_mat <- file.path(OUT_DIR, "tables", "ALK_10_fig3_panelC_ffpm_matrix.csv")
 write.csv(mat_fusion_c, out_csv_panel_c_mat)
 cat("  ", out_csv_panel_c_mat, "\n\n")
 
@@ -617,7 +617,7 @@ panel_d_puntos <- bind_rows(lapply(seq_len(nrow(FUSIONES_LLAMATIVAS)), function(
   base       <- muestras_por_faceta %>% filter(Faceta == faceta_obj)
   modelo     <- unique(base$Model)
 
-  genes_pos <- list(Izquierda = fila$GenLeft, Derecha = fila$GenRight)
+  genes_pos <- list(Left = fila$GenLeft, Right = fila$GenRight)
   bind_rows(lapply(names(genes_pos), function(pos) {
     g <- genes_pos[[pos]]
     if (is.na(g)) return(NULL)
@@ -629,7 +629,7 @@ panel_d_puntos <- bind_rows(lapply(seq_len(nrow(FUSIONES_LLAMATIVAS)), function(
     Etiqueta = factor(Etiqueta, levels = niveles)
   )
 
-out_csv_panel_d <- file.path(OUT_DIR, "tables", "ALK_10_fig3_panelD_genes_fusiones_llamativas.csv")
+out_csv_panel_d <- file.path(OUT_DIR, "tables", "ALK_10_fig3_panelD_striking_fusion_genes.csv")
 write.csv(panel_d_puntos, out_csv_panel_d, row.names = FALSE)
 cat("  ", out_csv_panel_d, "\n\n")
 
@@ -642,22 +642,22 @@ cat("  ", out_csv_panel_d, "\n\n")
 p_panel_d <- ggplot(panel_d_puntos, aes(x = LFC, y = Etiqueta, color = Posicion)) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey70") +
   geom_point(size = 2.8) +
-  geom_text(aes(label = Gen, hjust = if_else(Posicion == "Izquierda", 1.2, -0.2)),
+  geom_text(aes(label = Gen, hjust = if_else(Posicion == "Left", 1.2, -0.2)),
             color = "black", fontface = "bold", size = 2.6, show.legend = FALSE) +
   scale_x_continuous(expand = expansion(mult = 0.4)) +
   scale_y_discrete(limits = rev) +
   facet_grid(Faceta ~ ., scales = "free", space = "free_y") +
   # breaks set explicitly -- same reason as in Panel B, see the
   # comment there.
-  scale_color_manual(breaks = c("Izquierda", "Derecha"),
-                      values = c(Izquierda = COLOR_IZQUIERDA, Derecha = COLOR_DERECHA),
-                      labels = c("Gen izquierda", "Gen derecha")) +
+  scale_color_manual(breaks = c("Left", "Right"),
+                      values = c(Left = COLOR_IZQUIERDA, Right = COLOR_DERECHA),
+                      labels = c("Left gene", "Right gene")) +
   labs(
-    title = "Expresion de los genes de las fusiones llamativas (Panel C)",
+    title = "Expression of the genes of the striking fusions (Panel C)",
     x = "log2FC vs Untreated", y = NULL, color = NULL,
     caption = paste0(
-      "Mismo orden de filas que el Panel C (heatmap), pensado para leerse al lado. ",
-      "ALK1 solo tiene gen a la derecha (MBNL2) -- el otro lado de esa fusion es un locus sin simbolo anotado."
+      "Same row order as Panel C (heatmap), designed to be read side by side. ",
+      "ALK1 only has a gene on the right (MBNL2) -- the other side of that fusion is a locus without an annotated symbol."
     )
   ) +
   theme_minimal(base_size = 11) +
@@ -670,7 +670,7 @@ p_panel_d <- ggplot(panel_d_puntos, aes(x = LFC, y = Etiqueta, color = Posicion)
     panel.background = element_rect(fill = "white"), plot.background = element_rect(fill = "white")
   )
 
-out_png_panel_d <- file.path(OUT_DIR, "figures", "ALK_10_fig3_panelD_genes_fusiones_llamativas.png")
+out_png_panel_d <- file.path(OUT_DIR, "figures", "ALK_10_fig3_panelD_striking_fusion_genes.png")
 ggsave(out_png_panel_d, p_panel_d, width = 8.5, height = 11, dpi = 300)
 cat("  ", out_png_panel_d, "\n\n")
 

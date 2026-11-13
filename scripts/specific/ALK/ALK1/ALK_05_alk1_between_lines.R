@@ -99,7 +99,7 @@ ph_dist <- pheatmap(dist_mat,
          color          = heatmap_expr,
          annotation_col = ann_res,
          annotation_colors = ann_colors_res,
-         main           = paste("Distancias entre líneas resistentes —", OUT_PREFIX),
+         main           = paste("Distances between resistant lines —", OUT_PREFIX),
          silent         = TRUE)
 grid::grid.newpage()
 grid::grid.draw(ph_dist$gtable)
@@ -150,7 +150,7 @@ distinctive <- lfc_per_line %>%
   ungroup() %>%
   arrange(Model, desc(abs(LFC_vs_otras)))
 
-write.csv(distinctive, file.path(RESULTS_DIR, "tables", "05_genes_distintivos_por_linea.csv"), row.names = FALSE)
+write.csv(distinctive, file.path(RESULTS_DIR, "tables", "05_distinctive_genes_per_line.csv"), row.names = FALSE)
 cat("  Distinctive genes of a single line (not shared):", nrow(distinctive), "\n")
 for (li in resistant) {
   n_li <- sum(distinctive$Model == li)
@@ -164,7 +164,7 @@ distinctive_core <- distinctive %>% filter(Gene %in% alk_resistance_core)
 distinctive_wes  <- distinctive %>% filter(Gene %in% wes_panel_alk)
 cat("  alk_resistance_core:", paste0(distinctive_core$Gene, " [", distinctive_core$Model, "]", collapse = ", "), "\n")
 cat("  wes_panel_alk:      ", paste0(distinctive_wes$Gene,  " [", distinctive_wes$Model,  "]", collapse = ", "), "\n\n")
-write.csv(distinctive_wes, file.path(RESULTS_DIR, "tables", "05_genes_distintivos_wes_panel.csv"), row.names = FALSE)
+write.csv(distinctive_wes, file.path(RESULTS_DIR, "tables", "05_distinctive_genes_wes_panel.csv"), row.names = FALSE)
 
 # STEP 3: PAIRED SCATTERS (L1 vs L2, L1 vs L3, L2 vs L3...) -----------------
 cat("5. Paired scatters between lines...\n")
@@ -189,7 +189,7 @@ for (par in pares) {
     geom_text_repel(aes(label = label), size = 2.5, max.overlaps = 20,
                     segment.size = 0.2, box.padding = 0.3, color = "#e67e22", seed = 1) +
     labs(
-      title = paste0("Expresión ", a, " vs ", b, " — ", OUT_PREFIX),
+      title = paste0("Expression ", a, " vs ", b, " — ", OUT_PREFIX),
       subtitle = paste("Pearson r =", r_val),
       x = paste("log2CPM —", a), y = paste("log2CPM —", b)
     ) +
@@ -225,44 +225,44 @@ ph_var <- pheatmap(z_mat,
          cluster_rows      = TRUE,
          cluster_cols      = TRUE,
          clustering_method = "ward.D2",
-         main = paste0("Top ", length(top_var), " genes más variables entre líneas + forzados — ", OUT_PREFIX),
+         main = paste0("Top ", length(top_var), " most variable genes between lines + forced — ", OUT_PREFIX),
          silent = TRUE)
 grid::grid.newpage()
 grid::grid.draw(ph_var$gtable)
-save_pheatmap(ph_var, file.path(RESULTS_DIR, "figures", "05_heatmap_variables_entre_lineas.png"),
+save_pheatmap(ph_var, file.path(RESULTS_DIR, "figures", "05_heatmap_variable_between_lines.png"),
               width = 8, height = 10)
-cat("  → 05_heatmap_variables_entre_lineas.png (", length(genes_hm), "genes)\n\n")
+cat("  → 05_heatmap_variable_between_lines.png (", length(genes_hm), "genes)\n\n")
 
 # REPORT ----------------------------------------------------------------------
 cat("7. Generating report...\n")
 
 report_text <- paste0(
-  "# Comparación entre líneas resistentes — ", OUT_PREFIX, "\n\n",
-  "**Pregunta:** ¿en qué se diferencian L1/L2/L3 entre sí, más allá de lo que todas comparten frente a la parental/tratada?\n",
-  "**Método:** LFC de cada línea frente a la media de las otras 2 (sin réplicas técnicas -> sin test estadístico formal). ",
+  "# Comparison between resistant lines — ", OUT_PREFIX, "\n\n",
+  "**Question:** how do L1/L2/L3 differ from each other, beyond what they all share relative to the parental/treated?\n",
+  "**Method:** LFC of each line relative to the mean of the other 2 (no technical replicates -> no formal statistical test). ",
   "Threshold |LFC| >= ", LOGFC_THRESHOLD, "\n\n",
-  "## Correlación entre líneas (Pearson, log2CPM)\n",
+  "## Correlation between lines (Pearson, log2CPM)\n",
   paste(capture.output(print(round(cor_mat, 3))), collapse = "\n"), "\n\n",
-  "## Genes distintivos por línea (fuera de threshold en una sola línea)\n",
+  "## Distinctive genes per line (outside threshold in a single line only)\n",
   paste(capture.output(print(as.data.frame(tab_per_line), row.names = FALSE)), collapse = "\n"), "\n",
-  "- Total distintivos (no compartidos entre líneas): ", nrow(distinctive), "\n\n",
-  "## Cruce con paneles curados\n",
+  "- Total distinctive (not shared between lines): ", nrow(distinctive), "\n\n",
+  "## Overlap with curated panels\n",
   "- alk_resistance_core: ", if (nrow(distinctive_core) > 0)
-    paste0(distinctive_core$Gene, " [", distinctive_core$Model, "]", collapse = ", ") else "ninguno", "\n",
+    paste0(distinctive_core$Gene, " [", distinctive_core$Model, "]", collapse = ", ") else "none", "\n",
   "- wes_panel_alk: ", if (nrow(distinctive_wes) > 0)
-    paste0(distinctive_wes$Gene, " [", distinctive_wes$Model, "]", collapse = ", ") else "ninguno", "\n\n",
-  "## Genes forzados\n",
-  "- ", paste(FORCED_GENES, collapse = ", "), " — siempre incluidos en el heatmap de variabilidad y etiquetados en los scatters\n\n",
-  "## Tablas\n",
+    paste0(distinctive_wes$Gene, " [", distinctive_wes$Model, "]", collapse = ", ") else "none", "\n\n",
+  "## Forced genes\n",
+  "- ", paste(FORCED_GENES, collapse = ", "), " — always included in the variability heatmap and labelled in the scatters\n\n",
+  "## Tables\n",
   "- 05_correlation_between_lines.csv\n",
-  "- 05_lfc_per_line.csv (LFC de cada línea vs media de las otras 2, las 3 líneas)\n",
-  "- 05_genes_distintivos_por_linea.csv (solo genes exclusivos de 1 línea)\n",
-  "- 05_genes_distintivos_wes_panel.csv\n\n",
-  "## Figuras\n",
+  "- 05_lfc_per_line.csv (LFC of each line vs mean of the other 2, all 3 lines)\n",
+  "- 05_distinctive_genes_per_line.csv (only genes exclusive to 1 line)\n",
+  "- 05_distinctive_genes_wes_panel.csv\n\n",
+  "## Figures\n",
   "- 05_distances_between_lines.png\n",
   paste(paste0("- 05_scatter_", sapply(pares, `[`, 1), "_vs_", sapply(pares, `[`, 2), ".png\n"), collapse = ""),
-  "- 05_heatmap_variables_entre_lineas.png (top ", length(top_var), " por varianza + ",
-  paste(FORCED_GENES, collapse = "/"), " forzados; gradiente negro-gris-dorado)\n"
+  "- 05_heatmap_variable_between_lines.png (top ", length(top_var), " by variance + ",
+  paste(FORCED_GENES, collapse = "/"), " forced; black-grey-gold gradient)\n"
 )
 writeLines(report_text, file.path(RESULTS_DIR, "report", "05_between_lines_report.md"))
 cat("Report: report/05_between_lines_report.md\n\n")

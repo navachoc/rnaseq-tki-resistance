@@ -10,8 +10,8 @@
 # Inputs: results/ALK/{ALK1,ALK2,ALK3}/tables/01_mat_tmm.csv
 # Outputs (results/ALK/combined/figures/):
 #   ALK_09_fig1_panelA_heatmap_variables.png,
-#   ALK_09_fig1_panelBCD_pca_lineas[_sin_nombres].png,
-#   ALK_09_fig1_pca_{ALK1,ALK2,ALK3}[_sin_nombres].png
+#   ALK_09_fig1_panelBCD_pca_lines[_no_names].png,
+#   ALK_09_fig1_pca_{ALK1,ALK2,ALK3}[_no_names].png
 # Usage: source(here::here("scripts/specific/ALK/ALK_09_combined_figure.R"))
 #   or Rscript from any folder of the repo.
 # =============================================================================
@@ -151,8 +151,8 @@ ht_conjunto <- Heatmap(
   row_names_gp = gpar(fontsize = 6.5),
   column_names_gp = gpar(fontsize = 8),
   rect_gp = gpar(col = "grey30", lwd = 1),
-  heatmap_legend_param = list(title = "Z-score\n(TMM por gen)"),
-  column_title = paste0("Top ", TOP_N_VARIANZA, " genes mas variables — TMM conjunto Z-score (ALK1 + ALK2 + ALK3)")
+  heatmap_legend_param = list(title = "Z-score\n(TMM per gene)"),
+  column_title = paste0("Top ", TOP_N_VARIANZA, " most variable genes — joint TMM Z-score (ALK1 + ALK2 + ALK3)")
 )
 
 out_png_fig1a <- file.path(OUT_DIR, "figures", "ALK_09_fig1_panelA_heatmap_variables.png")
@@ -263,8 +263,8 @@ for (version in c("con", "sin")) {
   p_pca_apilado <- wrap_plots(lapply(pcas_rna, function(x) x[[version]]), ncol = 1) +
     plot_annotation(title = titulo_pca,
                     theme = theme(plot.title = element_text(face = "bold", size = 14)))
-  sufijo <- if (version == "sin") "_sin_nombres" else ""
-  out_png_fig1bcd <- file.path(OUT_DIR, "figures", paste0("ALK_09_fig1_panelBCD_pca_lineas", sufijo, ".png"))
+  sufijo <- if (version == "sin") "_no_names" else ""
+  out_png_fig1bcd <- file.path(OUT_DIR, "figures", paste0("ALK_09_fig1_panelBCD_pca_lines", sufijo, ".png"))
   ggsave(out_png_fig1bcd, p_pca_apilado, width = 8, height = 15, dpi = 300)
   cat("  ", out_png_fig1bcd, "\n")
 }
@@ -272,7 +272,7 @@ for (version in c("con", "sin")) {
 # Individual PNG per line, with and without names
 for (m in names(pcas_rna)) {
   out_m     <- file.path(OUT_DIR, "figures", paste0("ALK_09_fig1_pca_", m, ".png"))
-  out_m_sin <- file.path(OUT_DIR, "figures", paste0("ALK_09_fig1_pca_", m, "_sin_nombres.png"))
+  out_m_sin <- file.path(OUT_DIR, "figures", paste0("ALK_09_fig1_pca_", m, "_no_names.png"))
   ggsave(out_m,     pcas_rna[[m]]$con, width = 7, height = 6.5, dpi = 300)
   ggsave(out_m_sin, pcas_rna[[m]]$sin, width = 7, height = 6.5, dpi = 300)
   cat("  ", out_m, "\n  ", out_m_sin, "\n")

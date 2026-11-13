@@ -34,7 +34,7 @@
 #   ALK_11_fig1_heatmap_ALK1.png
 #   ALK_11_fig1_heatmap_ALK2.png
 #   ALK_11_fig1_heatmap_ALK3.png
-#   ALK_11_fig1_heatmap_combinado.png   (the 3 side by side, quick reference)
+#   ALK_11_fig1_heatmap_combined.png   (the 3 side by side, quick reference)
 #
 # Labels, axes and legends in English.
 #
@@ -193,7 +193,7 @@ leyenda_compartida <- packLegend(
   direction = "horizontal"
 )
 
-out_combinado <- file.path(OUT_DIR, "figures", "ALK_11_fig1_heatmap_combinado.png")
+out_combinado <- file.path(OUT_DIR, "figures", "ALK_11_fig1_heatmap_combined.png")
 
 # The 3 panels with the SAME width and height -- widths = 1/1/1 instead of
 # proportional to the number of columns of each model. Bottom row reserved

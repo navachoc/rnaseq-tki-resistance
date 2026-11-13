@@ -168,7 +168,7 @@ write.csv(lfc_table, file.path(RESULTS_DIR, "tables", "02_lfc_master_table.csv")
 
 classified_genes <- lfc_table %>% filter(Classification != "Other")
 write.csv(classified_genes, file.path(RESULTS_DIR, "tables", "02_classified_genes.csv"), row.names = FALSE)
-cat("  Tablas guardadas: 02_lfc_master_table.csv | 02_classified_genes.csv (long format, 1 row per gene x drug)\n\n")
+cat("  Tables saved: 02_lfc_master_table.csv | 02_classified_genes.csv (long format, 1 row per gene x drug)\n\n")
 
 # CONVERGENCE BETWEEN DRUGS --------------------------------------------------
 # Genes Upregulated/Downregulated in BOTH drugs = candidates for a resistance
@@ -185,18 +185,18 @@ up_both   <- intersect(up_lorla, up_alec)
 down_both <- intersect(down_lorla, down_alec)
 
 convergencia <- bind_rows(
-  tibble(Gene = up_both,    Classification = "Upregulated",   Criterio = "Ambos fármacos"),
-  tibble(Gene = setdiff(up_lorla, up_alec),     Classification = "Upregulated",   Criterio = "Solo Lorlatinib"),
-  tibble(Gene = setdiff(up_alec, up_lorla),     Classification = "Upregulated",   Criterio = "Solo Alectinib"),
-  tibble(Gene = down_both,  Classification = "Downregulated", Criterio = "Ambos fármacos"),
-  tibble(Gene = setdiff(down_lorla, down_alec), Classification = "Downregulated", Criterio = "Solo Lorlatinib"),
-  tibble(Gene = setdiff(down_alec, down_lorla), Classification = "Downregulated", Criterio = "Solo Alectinib")
+  tibble(Gene = up_both,    Classification = "Upregulated",   Criterio = "Both drugs"),
+  tibble(Gene = setdiff(up_lorla, up_alec),     Classification = "Upregulated",   Criterio = "Lorlatinib only"),
+  tibble(Gene = setdiff(up_alec, up_lorla),     Classification = "Upregulated",   Criterio = "Alectinib only"),
+  tibble(Gene = down_both,  Classification = "Downregulated", Criterio = "Both drugs"),
+  tibble(Gene = setdiff(down_lorla, down_alec), Classification = "Downregulated", Criterio = "Lorlatinib only"),
+  tibble(Gene = setdiff(down_alec, down_lorla), Classification = "Downregulated", Criterio = "Alectinib only")
 )
-write.csv(convergencia, file.path(RESULTS_DIR, "tables", "02_convergencia_farmacos.csv"), row.names = FALSE)
+write.csv(convergencia, file.path(RESULTS_DIR, "tables", "02_drug_convergence.csv"), row.names = FALSE)
 
 cat("  Upregulated in both drugs:", length(up_both), "(", paste(up_both, collapse = ", "), ")\n")
 cat("  Downregulated in both drugs:", length(down_both), "(", paste(down_both, collapse = ", "), ")\n")
-cat("  → 02_convergencia_farmacos.csv\n\n")
+cat("  → 02_drug_convergence.csv\n\n")
 
 # FIGURE: LFC HISTOGRAM, FACETED BY DRUG -----------------------------
 cat("4. Figures...\n")
@@ -288,7 +288,7 @@ p_scatter <- ggplot(plot_df, aes(Mean_Expr_Trt, LFC_Res_vs_Trt, color = Classifi
   scale_color_manual(values = classification_colors) +
   labs(
     title = paste("LFC scatter (MA plot) — Upregulated vs Downregulated —", OUT_PREFIX),
-    x = "Mean Treated parental log2CPM (propia de cada fármaco)",
+    x = "Mean Treated parental log2CPM (specific to each drug)",
     y = "LFC Resistant vs Treated (primary)"
   ) +
   theme_minimal(base_size = 12) +
@@ -355,21 +355,21 @@ genes_top50 <- unique(c(
 ))
 if (length(genes_top50) >= 2) {
   plot_heatmap_genes(genes_top50, "02_heatmap_top50.png",
-                      "Top50 por fármaco (25 Up + 25 Down cada uno, unión)")
+                      "Top50 per drug (25 Up + 25 Down each, union)")
 } else {
   cat("  ⚠ Fewer than 2 classified genes — top50 skipped\n\n")
 }
 
 # (b) Cancer/resistance genes (alk_resistance_core, fixed curated list)
 cat("  (b) Cancer/resistance panel (alk_resistance_core)...\n")
-plot_heatmap_genes(alk_resistance_core, "02_heatmap_cancer_resistencia.png",
+plot_heatmap_genes(alk_resistance_core, "02_heatmap_cancer_resistance.png",
                     "alk_resistance_core")
 
 # (c) Genes of the curated WES panel (wes_panel_alk) — full panel; the
 #     FILTERED version is generated in ALK_03_alk3_key_genes.R
 cat("  (c) Full curated WES panel (wes_panel_alk)...\n")
 plot_heatmap_genes(wes_panel_alk, "02_heatmap_wes_panel.png",
-                    "WES curated panel (wes_panel_alk) — completo")
+                    "WES curated panel (wes_panel_alk) — full")
 
 cat("Tables ready for ALK_03_alk3_key_genes.R and ALK_04_alk3_pathways.R.\n\n")
 
@@ -386,7 +386,7 @@ summarize_drug <- function(drug) {
     arrange(LFC_Res_vs_Trt) %>% slice_head(n = 10) %>% dplyr::select(Gene, LFC_Res_vs_Trt)
   paste0(
     "### ", drug, "\n",
-    "| Clase | N | % |\n|-------|---|---|\n",
+    "| Class | N | % |\n|-------|---|---|\n",
     "| Upregulated | ", n_up, " | ", round(100*n_up/nrow(df),1), "% |\n",
     "| Downregulated | ", n_down, " | ", round(100*n_down/nrow(df),1), "% |\n",
     "| Other | ", n_other, " | ", round(100*n_other/nrow(df),1), "% |\n\n",
@@ -400,29 +400,29 @@ summarize_drug <- function(drug) {
 
 report_text <- paste0(
   "# LFC Report — ", OUT_PREFIX, "\n\n",
-  "**Threshold:** |LFC| ≥ ", LOGFC_THRESHOLD, " sobre LFC_Res_vs_Trt\n",
-  "**Método:** cada fármaco compara sus propios resistentes contra su propia parental treated ",
-  "(ALK3_L / ALK3_A), ambos frente a la misma parental untreated (ALK3) — tabla larga con columna Drug.\n\n",
-  "## Clasificación por fármaco\n",
+  "**Threshold:** |LFC| ≥ ", LOGFC_THRESHOLD, " on LFC_Res_vs_Trt\n",
+  "**Method:** each drug compares its own resistant lines against its own treated parental ",
+  "(ALK3_L / ALK3_A), both relative to the same untreated parental (ALK3) — long table with Drug column.\n\n",
+  "## Classification per drug\n",
   summarize_drug("Lorlatinib"),
   summarize_drug("Alectinib"),
-  "## Convergencia entre fármacos\n",
-  "- Upregulated en ambos: ", length(up_both), " (", paste(up_both, collapse = ", "), ")\n",
-  "- Downregulated en ambos: ", length(down_both), " (", paste(down_both, collapse = ", "), ")\n",
-  "- Ver 02_convergencia_farmacos.csv para el detalle completo (solo Lorlatinib / solo Alectinib / ambos)\n\n",
-  "## Genes forzados en todas las figuras\n",
-  "- ", paste(FORCED_GENES, collapse = ", "), " (fusión driver EML4-ALK) — siempre incluidos ",
-  "en el scatter y en los 3 heatmaps, pasen o no el filtro de LFC\n\n",
-  "## Figuras\n",
-  "- 02_lfc_histogram.png (faceteado por fármaco)\n",
-  "- 02_classification_barplot.png (faceteado por fármaco)\n",
-  "- 02_lfc_scatter.png (MA plot faceteado por fármaco; etiquetados: top15 Up + top15 Down + ",
-  "alk_resistance_core + forzados, por fármaco)\n",
-  "- 02_heatmap_top50.png (unión top25 Up + top25 Down de cada fármaco + ", paste(FORCED_GENES, collapse = "/"),
-  "; gradiente negro-gris-dorado; anotado por Drug)\n",
-  "- 02_heatmap_cancer_resistencia.png (alk_resistance_core, panel completo)\n",
-  "- 02_heatmap_wes_panel.png (wes_panel_alk, panel completo)\n",
-  "- Nota: el heatmap del panel WES FILTRADO se genera en ALK_03_alk3_key_genes.R\n"
+  "## Convergence between drugs\n",
+  "- Upregulated in both: ", length(up_both), " (", paste(up_both, collapse = ", "), ")\n",
+  "- Downregulated in both: ", length(down_both), " (", paste(down_both, collapse = ", "), ")\n",
+  "- See 02_drug_convergence.csv for full detail (Lorlatinib only / Alectinib only / both)\n\n",
+  "## Genes forced in all figures\n",
+  "- ", paste(FORCED_GENES, collapse = ", "), " (EML4-ALK driver fusion) — always included ",
+  "in the scatter and in the 3 heatmaps, whether or not they pass the LFC filter\n\n",
+  "## Figures\n",
+  "- 02_lfc_histogram.png (faceted by drug)\n",
+  "- 02_classification_barplot.png (faceted by drug)\n",
+  "- 02_lfc_scatter.png (MA plot faceted by drug; labelled: top15 Up + top15 Down + ",
+  "alk_resistance_core + forced, per drug)\n",
+  "- 02_heatmap_top50.png (union of top25 Up + top25 Down of each drug + ", paste(FORCED_GENES, collapse = "/"),
+  "; black-grey-gold gradient; annotated by Drug)\n",
+  "- 02_heatmap_cancer_resistance.png (alk_resistance_core, full panel)\n",
+  "- 02_heatmap_wes_panel.png (wes_panel_alk, full panel)\n",
+  "- Note: the FILTERED WES panel heatmap is generated in ALK_03_alk3_key_genes.R\n"
 )
 writeLines(report_text, file.path(RESULTS_DIR, "report", "02_lfc_report.md"))
 cat("Report: report/02_lfc_report.md\n\n")

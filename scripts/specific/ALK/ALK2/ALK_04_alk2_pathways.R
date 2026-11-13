@@ -277,14 +277,14 @@ cat("\n")
 # REPORT --------------------------------------------------------------------
 extract_top <- function(res, type = "go", n = 10) {
   obj <- res[[type]]
-  if (is.null(obj) || nrow(obj@result) == 0) return("Sin resultados significativos")
+  if (is.null(obj) || nrow(obj@result) == 0) return("No significant results")
   top <- head(obj@result %>% arrange(p.adjust) %>%
                 dplyr::select(Description, p.adjust, Count), n)
   paste(capture.output(print(top, row.names = FALSE)), collapse = "\n")
 }
 
 extract_top_gsea <- function(res, n = 10) {
-  if (is.null(res) || nrow(res@result) == 0) return("Sin resultados significativos")
+  if (is.null(res) || nrow(res@result) == 0) return("No significant results")
   top <- head(res@result %>% arrange(p.adjust) %>%
                 dplyr::select(Description, NES, p.adjust), n)
   paste(capture.output(print(top, row.names = FALSE)), collapse = "\n")
@@ -296,11 +296,11 @@ report_text <- paste0(
   extract_top(res_up, "go", 10), "\n\n",
   "## ORA KEGG — ", up_label, " (top 10)\n",
   extract_top(res_up, "kegg", 10), "\n\n",
-  "## GSEA GO BP (top 10 por p.adjust)\n",
+  "## GSEA GO BP (top 10 by p.adjust)\n",
   extract_top_gsea(res_gsea_go, 10), "\n\n",
-  "## GSEA KEGG (top 10 por p.adjust)\n",
+  "## GSEA KEGG (top 10 by p.adjust)\n",
   extract_top_gsea(res_gsea_kegg, 10), "\n\n",
-  "## Figuras\n",
+  "## Figures\n",
   "- 04_go_bp_", tolower(gsub(" ", "_", up_label)), ".png\n",
   "- 04_kegg_", tolower(gsub(" ", "_", up_label)), ".png\n",
   if (!is.null(res_down)) "- 04_go_bp_downregulated.png\n- 04_kegg_downregulated.png\n" else "",

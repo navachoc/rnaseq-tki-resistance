@@ -53,7 +53,7 @@ ret_wes_gene_panel <- data.frame(
            "IBA57", "ADAM12"),
   Model = c("RET1", "RET1", "RET2", "RET1", "RET2", "RET2", "RET2",
             "RET2", "RET2", "RET1", "RET1", "RET2", "RET2", "RET2",
-            "Ambos", "Ambos",
+            "Both", "Both",
             "RET1", "RET1", "RET1", "RET1", "RET1", "RET2",
             "RET2", "RET2", "RET2", "RET2", "RET2", "RET2", "RET2",
             "RET2", "RET2",
@@ -191,7 +191,7 @@ for (cl in CELL_LINES) {
   ann_colors     <- make_annotation(metadata_unit)
 
   wes_panel <- ret_wes_gene_panel %>%
-    filter(Model %in% c(cl, "Ambos")) %>%
+    filter(Model %in% c(cl, "Both")) %>%
     distinct(Gene)
 
   wes_genes     <- wes_panel$Gene[wes_panel$Gene %in% rownames(mat)]
@@ -226,13 +226,13 @@ for (cl in CELL_LINES) {
 
   make_stripplot(cnv_genes, mat, metadata_unit, sample_order, drugs,
                  paste0("Panel CNV (WES) — ", cl, "_", RECEPTOR),
-                 "Genes con amplificación/deleción (CORE_BYPASS)",
+                 "Genes with amplification/deletion (CORE_BYPASS)",
                  file.path(RESULTS_DIR, "figures", paste0("03c_stripplot_cnv_panel_", cl, ".png")))
   cat("   → 03c_stripplot_cnv_panel_", cl, ".png (", length(cnv_genes), "genes)\n", sep = "")
 
   make_stripplot(snv_genes, mat, metadata_unit, sample_order, drugs,
-                 paste0("Panel SNV (scDNA + recurrentes) — ", cl, "_", RECEPTOR),
-                 "Genes con missense/stop-gained/SNV recurrente",
+                 paste0("SNV panel (scDNA + recurrent) — ", cl, "_", RECEPTOR),
+                 "Genes with missense/stop-gained/recurrent SNV",
                  file.path(RESULTS_DIR, "figures", paste0("03c_stripplot_snv_panel_", cl, ".png")))
   cat("   → 03c_stripplot_snv_panel_", cl, ".png (", length(snv_genes), "genes)\n\n", sep = "")
 }
@@ -273,8 +273,8 @@ if (length(wes_genes_full) >= 3) {
            show_colnames     = TRUE,
            fontsize_row      = 8,
            fontsize_col      = 8,
-           main = paste0("Panel WES/scDNA/SNV combinado — ", paste(CELL_LINES, collapse = " + "),
-                         " (", length(wes_genes_full), " genes, ", ncol(mat_combined), " muestras)"),
+           main = paste0("Combined WES/scDNA/SNV panel — ", paste(CELL_LINES, collapse = " + "),
+                         " (", length(wes_genes_full), " genes, ", ncol(mat_combined), " samples)"),
            silent = TRUE)
 
   dir.create(here::here("results", RECEPTOR, "combined", "figures"), recursive = TRUE, showWarnings = FALSE)

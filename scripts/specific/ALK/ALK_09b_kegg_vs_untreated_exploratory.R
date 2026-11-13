@@ -8,18 +8,18 @@
 # classification bases, to compare which pathways/processes emerge depending
 # on the comparator:
 #
-#   1) vs_no_tratada -- LFC_Res_vs_Unt (total change of the resistant line
+#   1) vs_untreated -- LFC_Res_vs_Unt (total change of the resistant line
 #      versus the untreated parental, the metric of the per-sample LFC
 #      heatmaps)
-#   2) vs_tratada     -- LFC_Res_vs_Trt (the main comparator of ALK_02/
+#   2) vs_treated     -- LFC_Res_vs_Trt (the main comparator of ALK_02/
 #      ALK_04, isolates the resistance-specific effect from the acute drug
 #      effect)
-#   3) combinado      -- intersection of the two above (a gene counts as
+#   3) combined       -- intersection of the two above (a gene counts as
 #      Up/Down only if it passes the threshold in BOTH, same direction in
 #      both). It combines the total change with the filter against the
 #      treated parental, which removes genes whose "total" change is actually
-#      inherited from the acute drug effect (significant in vs_no_tratada but
-#      flat in vs_tratada). NOTE: this does NOT resolve heterogeneity between
+#      inherited from the acute drug effect (significant in vs_untreated but
+#      flat in vs_treated). NOTE: this does NOT resolve heterogeneity between
 #      resistant populations of the same model (e.g. KRAS/BCAT1 in ALK2,
 #      flat in the pooled Res_vs_Trt although the change in L4/L5 is real);
 #      that still requires manually forcing genes, it is an aggregation
@@ -70,9 +70,9 @@ RUTAS_IMPORTANTES_ACTUAL <- c(
   "Cadherin signaling"
 )
 
-LFC_MODOS <- c("vs_no_tratada", "vs_tratada", "combinado")
+LFC_MODOS <- c("vs_untreated", "vs_treated", "combined")
 
-# Classify Up/Down according to the mode. "combinado" requires passing the
+# Classify Up/Down according to the mode. "combined" requires passing the
 # threshold in both LFC_Res_vs_Unt AND LFC_Res_vs_Trt, same direction in both.
 clasificar_genes <- function(df, modo, threshold) {
   up_unt   <- df$LFC_Res_vs_Unt >  threshold
@@ -80,11 +80,11 @@ clasificar_genes <- function(df, modo, threshold) {
   up_trt   <- df$LFC_Res_vs_Trt >  threshold
   down_trt <- df$LFC_Res_vs_Trt < -threshold
 
-  if (modo == "vs_no_tratada") {
+  if (modo == "vs_untreated") {
     list(up = df$Gene[up_unt], down = df$Gene[down_unt])
-  } else if (modo == "vs_tratada") {
+  } else if (modo == "vs_treated") {
     list(up = df$Gene[up_trt], down = df$Gene[down_trt])
-  } else if (modo == "combinado") {
+  } else if (modo == "combined") {
     list(up = df$Gene[up_unt & up_trt], down = df$Gene[down_unt & down_trt])
   } else {
     stop("Unknown mode: ", modo)
@@ -205,10 +205,10 @@ generar_figura <- function(top_df, tipo, modo, titulo_tipo) {
 
   p <- wrap_plots(paneles, ncol = 2) +
     plot_annotation(
-      title = paste0(titulo_tipo, " (top 8, Up+Down) — ", modo, " — exploratorio, ALK1 + ALK2 + ALK3"),
+      title = paste0(titulo_tipo, " (top 8, Up+Down) — ", modo, " — exploratory, ALK1 + ALK2 + ALK3"),
       caption = paste0(
-        "EXPLORATORIO -- clasificacion Up/Down por '", modo, "'. ",
-        "Circulo = Upregulated, triangulo = Downregulated. En negrita: rutas ya en RUTAS_IMPORTANTES (ALK_09, solo aplica a KEGG)."
+        "EXPLORATORY -- Up/Down classification by '", modo, "'. ",
+        "Circle = Upregulated, triangle = Downregulated. Bold: pathways already in RUTAS_IMPORTANTES (ALK_09, KEGG only)."
       ),
       theme = theme(
         plot.title   = element_text(face = "bold", size = 14),

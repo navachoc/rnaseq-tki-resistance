@@ -388,7 +388,7 @@ if (DATASET %in% TWO_CLASS_DATASETS) {
     cat("  → 03_heatmap_signature.png (top50:",
         length(top25_up), "up /", length(top25_down), "down)\n\n")
   } else {
-    cat("  Menos de 3 genes en la firma — heatmap omitido\n\n")
+    cat("  Fewer than 3 genes in the signature — heatmap skipped\n\n")
   }
 } else {
   cat("5. Resistance signature heatmap (Figure 2)...\n")
@@ -434,7 +434,7 @@ if (DATASET %in% TWO_CLASS_DATASETS) {
     cat("  → 03_heatmap_signature.png (top50:",
         length(top25_up), "up /", length(top25_down), "down)\n\n")
   } else {
-    cat("  Menos de 3 genes en la firma — heatmap omitido\n\n")
+    cat("  Fewer than 3 genes in the signature — heatmap skipped\n\n")
   }
 }
 
@@ -789,33 +789,33 @@ if (DATASET %in% TWO_CLASS_DATASETS) {
       as.data.frame(slice_head(down_genes, n = 15) %>%
                       dplyr::select(Gene, LFC_Res_vs_Par)),
       row.names = FALSE)), collapse = "\n"), "\n\n",
-    "## Genes forzados (NF2/NRG1)\n",
+    "## Forced genes (NF2/NRG1)\n",
     if (nrow(forced_df) > 0)
       paste(forced_df$Gene, "LFC =",
             round(forced_df$LFC_Res_vs_Par, 2), collapse = "; ")
-    else "Todos superan el threshold", "\n\n",
-    "## Genes conocidos detectados (Upregulated)\n",
+    else "All pass the threshold", "\n\n",
+    "## Known genes detected (Upregulated)\n",
     if (length(known_hits_up) > 0)
-      paste(known_hits_up, collapse = ", ") else "ninguno", "\n\n",
-    "## Genes conocidos detectados (Downregulated)\n",
+      paste(known_hits_up, collapse = ", ") else "none", "\n\n",
+    "## Known genes detected (Downregulated)\n",
     if (length(known_hits_down) > 0)
-      paste(known_hits_down, collapse = ", ") else "ninguno", "\n\n",
+      paste(known_hits_down, collapse = ", ") else "none", "\n\n",
     "## Genes stripplot/lineplot\n",
-    "- Fijos:    ", paste(GENES_FIXED, collapse = ", "), "\n",
+    "- Fixed:    ", paste(GENES_FIXED, collapse = ", "), "\n",
     "- Top3 Up:  ", paste(top3_up,    collapse = ", "), "\n",
     "- Top3 Down:", paste(top3_down,  collapse = ", "), "\n\n",
-    paste0("## Firma ", sig_prefix, "_resistance_signature_conservative.csv\n"),
+    paste0("## Signature ", sig_prefix, "_resistance_signature_conservative.csv\n"),
     "- N genes: ", nrow(signature_cons), " (",
     sum(signature_cons$Classification == "Upregulated"), " up / ",
     sum(signature_cons$Classification == "Downregulated"), " down)\n",
-    "- Genes forzados incluidos: ",
+    "- Forced genes included: ",
     paste(FORCED_GENES[FORCED_GENES %in% signature_cons$Gene],
           collapse = ", "), "\n\n",
-    "## Figuras\n",
-    "- 03_heatmap_gimenez.png     — genes exactos Giménez-Xavier 2017\n",
-    "- 03_heatmap_signature.png   — firma completa con NF2/NRG1 forzados\n",
-    "- 03_stripplot_key_genes.png — expresión por GX cluster\n",
-    "- 03_lineplot_key_genes.png  — trayectoria por modelo vs parental\n"
+    "## Figures\n",
+    "- 03_heatmap_gimenez.png     — exact Giménez-Xavier 2017 genes\n",
+    "- 03_heatmap_signature.png   — full signature with forced NF2/NRG1\n",
+    "- 03_stripplot_key_genes.png — expression per GX cluster\n",
+    "- 03_lineplot_key_genes.png  — trajectory per model vs parental\n"
   )
 } else {
   acq_lbl <- unname(CLASS_LABELS["acq"])
@@ -823,7 +823,7 @@ if (DATASET %in% TWO_CLASS_DATASETS) {
 
   report_text <- paste0(
     "# Key Genes Report — ", OUT_PREFIX, "\n\n",
-    "**Firma:** data-driven (sin lista de genes conocida) — ", acq_lbl, " + ", pre_lbl, " + Downregulated\n\n",
+    "**Signature:** data-driven (no known gene list) — ", acq_lbl, " + ", pre_lbl, " + Downregulated\n\n",
     "## Top 15 ", acq_lbl, "\n",
     paste(capture.output(print(
       as.data.frame(slice_head(up_genes, n = 15) %>%
@@ -834,22 +834,22 @@ if (DATASET %in% TWO_CLASS_DATASETS) {
       as.data.frame(slice_head(pre_genes, n = 10) %>%
                       dplyr::select(Gene, LFC_Res_vs_Trt, LFC_Res_vs_Unt)),
       row.names = FALSE)), collapse = "\n"), "\n\n",
-    "## alk_resistance_core detectados (referencia genérica, no específica de ", RECEPTOR, ")\n",
+    "## alk_resistance_core detected (generic reference, not specific to ", RECEPTOR, ")\n",
     "- ", acq_lbl, ": ", paste(core_acq,  collapse = ", "), "\n",
     "- ", pre_lbl, ": ", paste(core_pre,  collapse = ", "), "\n",
     "- Downregulated:", paste(core_down, collapse = ", "), "\n\n",
-    paste0("## Firma ", sig_prefix, "_resistance_signature_conservative.csv\n"),
+    paste0("## Signature ", sig_prefix, "_resistance_signature_conservative.csv\n"),
     "- N genes: ", nrow(signature_cons), " (",
     sum(signature_cons$Classification == acq_lbl), " ", acq_lbl, " / ",
     sum(signature_cons$Classification == pre_lbl), " ", pre_lbl, " / ",
     sum(signature_cons$Classification == "Downregulated"), " down)\n\n",
-    "## Genes stripplot/lineplot (top LFC, sin lista conocida)\n",
+    "## Stripplot/lineplot genes (top LFC, no known list)\n",
     "- Top5 ", acq_lbl, ":     ", paste(top5_up,   collapse = ", "), "\n",
     "- Top5 Downregulated:", paste(top5_down, collapse = ", "), "\n\n",
-    "## Figuras\n",
-    "- 03_heatmap_signature.png   — firma completa (top25 up + top25 down)\n",
-    "- 03_stripplot_key_genes.png — expresión por muestra\n",
-    "- 03_lineplot_key_genes.png  — trayectoria por modelo resistente vs nivel Treated\n"
+    "## Figures\n",
+    "- 03_heatmap_signature.png   — full signature (top25 up + top25 down)\n",
+    "- 03_stripplot_key_genes.png — expression per sample\n",
+    "- 03_lineplot_key_genes.png  — trajectory per resistant model vs Treated level\n"
   )
 }
 

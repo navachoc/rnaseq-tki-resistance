@@ -42,16 +42,16 @@
 #
 # Outputs (results/RET/combined/):
 #   figures/RET_09_fig2_lfc_heatmap_{RET1,RET2}.png   (LFC heatmap per model)
-#   figures/RET_09_fig2_lfc_heatmap_combinado.png      (LFC heatmaps side by side)
+#   figures/RET_09_fig2_lfc_heatmap_combined.png      (LFC heatmaps side by side)
 #   figures/RET_09_fig2_lfc_heatmap_{RET1,RET2}_gene_order.csv
 #                                                      (row order after clustering)
 #   figures/RET_09_fig2_lfc_heatmap_pie.txt            (descriptive text of the heatmap)
 #   figures/RET_09_fig2_go_enrichment.png, tables/RET_09_fig2_go_enrichment.csv
 #   figures/RET_09_fig2_fusions_dotplot.png, tables/RET_09_fig2_fusions_trajectory.csv
-#   figures/RET_09_fig2_panel_combinado.png            (combined figure)
+#   figures/RET_09_fig2_panel_combined.png            (combined figure)
 #
-# Labels, axes and heatmap titles in English; color legend (title +
-# categories) in Spanish where applicable.
+# Labels, axes, heatmap titles and color legends (title + categories) in
+# English.
 #
 # Dependencies (run first):
 #   scripts/simple/rna_01.1_qc.R with DATASET = "RET1" and "RET2" (01_* tables)
@@ -79,7 +79,7 @@ MODELOS <- c("RET1", "RET2")
 
 GRADIENTE_RNA <- c("#000000", "#808080", "#f2a900")
 COLOR_MODEL   <- c(RET1 = "#A55EEA", RET2 = "#F368E0")
-COLOR_CONDICION <- c(Parental = "#e6a817", Resistente = "#013c58")
+COLOR_CONDICION <- c(Parental = "#e6a817", Resistant = "#013c58")
 COLOR_DRUG      <- c(BLU667 = "#6C5CE7", LOXO292 = "#00B894")  # same hex as RET_08/rna_08.1_fusions_ret.R ("No" does not apply here, the untreated parental is not a column)
 
 TOP_N_LFC <- 25  # per direction (Up/Down); 50 genes per model, including GENES_FORZADOS (section 2)
@@ -211,7 +211,7 @@ construir_heatmap_modelo <- function(modelo, lfc_mat, cols_meta, top_lfc, mostra
 
   idx_meta      <- match(colnames(mat_final), cols_meta$Sample)
   col_modelo    <- setNames(rep(modelo, ncol(mat_final)), colnames(mat_final))
-  col_condicion <- setNames(ifelse(cols_meta$Condition[idx_meta] == "Resistance", "Resistente", "Parental"), colnames(mat_final))
+  col_condicion <- setNames(ifelse(cols_meta$Condition[idx_meta] == "Resistance", "Resistant", "Parental"), colnames(mat_final))
   col_drug      <- setNames(cols_meta$Drug[idx_meta], colnames(mat_final))
   # Column label more readable than the raw sample name: drops the "MODEL_"
   # prefix (e.g. "RET1_BR1" -> "BR1"); acutely treated parentals
@@ -222,10 +222,10 @@ construir_heatmap_modelo <- function(modelo, lfc_mat, cols_meta, top_lfc, mostra
   names(col_modelo) <- names(col_condicion) <- names(col_drug) <- etiqueta_col
 
   ann_top <- HeatmapAnnotation(
-    Modelo    = col_modelo,
-    `Condición` = col_condicion,
-    Inhibidor = col_drug,
-    col = list(Modelo = COLOR_MODEL, `Condición` = COLOR_CONDICION, Inhibidor = COLOR_DRUG),
+    Model     = col_modelo,
+    Condition = col_condicion,
+    Drug      = col_drug,
+    col = list(Model = COLOR_MODEL, Condition = COLOR_CONDICION, Drug = COLOR_DRUG),
     show_annotation_name = FALSE,
     show_legend = mostrar_leyenda,
     simple_anno_size = unit(3, "mm")
@@ -244,7 +244,7 @@ construir_heatmap_modelo <- function(modelo, lfc_mat, cols_meta, top_lfc, mostra
     top_annotation = ann_top,
     show_heatmap_legend = mostrar_leyenda,
     rect_gp = gpar(col = "grey85", lwd = 0.5),
-    heatmap_legend_param = list(title = "LFC\n(Resistente vs Parental sin tratar,\npor línea)",
+    heatmap_legend_param = list(title = "LFC\n(Resistant vs untreated Parental,\nper line)",
                                  at = c(-LFC_MAX, 0, LFC_MAX)),
     column_title = paste0(modelo, " -- Treated parental + Resistant lines vs Untreated parental (", length(top_lfc), " genes)")
   )
@@ -279,15 +279,15 @@ for (modelo in names(resultados)) {
 # Descriptive text of the LFC heatmap (same spirit as ALK_12): explains why the
 # untreated parental is not a column and that the LFC is 1 vs 1 per line.
 PIE_FIGURA <- paste0(
-  "LFC de cada columna (parental tratada de forma aguda + lineas resistentes) frente a la parental sin tratar del mismo modelo ",
-  "(comparacion 1:1 por muestra, no promedio del grupo -- igual criterio que en ALK). La parental sin tratar no se muestra como ",
-  "columna: por definicion su LFC frente a si misma seria 0 en todas las filas. La parental tratada SI se muestra (columna ",
-  "'Treated_BLU667'/'Treated_LOXO292' segun farmaco) pero no participa en la seleccion de genes Top LFC, solo aporta contexto de la ",
-  "respuesta aguda pre-resistencia. Escala de color fija de -", LFC_MAX, " a ", LFC_MAX, ": los genes con |LFC|>", LFC_MAX,
-  " saturan al color extremo. Los ", TOP_N_LFC * 2, " genes de cada panel (", TOP_N_LFC, " mas sobreexpresados + ", TOP_N_LFC,
-  " mas infraexpresados por magnitud de LFC entre las lineas resistentes de ese modelo) son mayoritariamente por ranking de LFC, ",
-  "salvo un panel fijo minimo de genes de bypass conocidos (AXL y FGFR1 en RET1, ALK en RET2), ",
-  "verificados a mano por su patron consistente pese a no alcanzar el top-LFC por magnitud bruta."
+  "LFC of each column (acutely treated parental + resistant lines) relative to the untreated parental of the same model ",
+  "(1:1 comparison per sample, not a group average -- same criterion as in ALK). The untreated parental is not shown as a ",
+  "column: by definition its LFC against itself would be 0 in all rows. The treated parental IS shown (column ",
+  "'Treated_BLU667'/'Treated_LOXO292' depending on the drug) but does not take part in the selection of Top LFC genes, it only provides context on the ",
+  "acute pre-resistance response. Fixed color scale from -", LFC_MAX, " a ", LFC_MAX, ": genes with |LFC|>", LFC_MAX,
+  " saturate to the extreme color. The ", TOP_N_LFC * 2, " genes of each panel (", TOP_N_LFC, " most upregulated + ", TOP_N_LFC,
+  " most downregulated by LFC magnitude among the resistant lines of that model) are mostly chosen by LFC ranking, ",
+  "except for a minimal fixed panel of known bypass genes (AXL and FGFR1 in RET1, ALK in RET2), ",
+  "manually verified for their consistent pattern despite not reaching the top LFC by raw magnitude."
 )
 cat("Figure footnote (LFC heatmap):\n ", PIE_FIGURA, "\n\n")
 writeLines(PIE_FIGURA, file.path(OUT_DIR, "figures", "RET_09_fig2_lfc_heatmap_pie.txt"))
@@ -302,15 +302,15 @@ ht_ret1_comb <- construir_heatmap_modelo("RET1", LFC_MATS[["RET1"]], COLS_META[[
 ht_ret2_comb  <- construir_heatmap_modelo("RET2",  LFC_MATS[["RET2"]],  COLS_META[["RET2"]],  TOP_LFC[["RET2"]],  mostrar_leyenda = FALSE)$ht
 
 leyenda_panel_a <- packLegend(
-  Legend(col_fun = COL_FUN_LFC, title = "LFC (Resistente vs Parental sin tratar)",
+  Legend(col_fun = COL_FUN_LFC, title = "LFC (Resistant vs untreated Parental)",
          direction = "horizontal", legend_width = unit(4, "cm"), at = c(-LFC_MAX, 0, LFC_MAX)),
-  Legend(labels = names(COLOR_MODEL), legend_gp = gpar(fill = COLOR_MODEL), title = "Modelo", direction = "horizontal"),
-  Legend(labels = names(COLOR_CONDICION), legend_gp = gpar(fill = COLOR_CONDICION), title = "Condición", direction = "horizontal"),
-  Legend(labels = names(COLOR_DRUG), legend_gp = gpar(fill = COLOR_DRUG), title = "Inhibidor", direction = "horizontal"),
+  Legend(labels = names(COLOR_MODEL), legend_gp = gpar(fill = COLOR_MODEL), title = "Model", direction = "horizontal"),
+  Legend(labels = names(COLOR_CONDICION), legend_gp = gpar(fill = COLOR_CONDICION), title = "Condition", direction = "horizontal"),
+  Legend(labels = names(COLOR_DRUG), legend_gp = gpar(fill = COLOR_DRUG), title = "Drug", direction = "horizontal"),
   direction = "horizontal"
 )
 
-out_panel_a_combinado <- file.path(OUT_DIR, "figures", "RET_09_fig2_lfc_heatmap_combinado.png")
+out_panel_a_combinado <- file.path(OUT_DIR, "figures", "RET_09_fig2_lfc_heatmap_combined.png")
 png(out_panel_a_combinado, width = 2 * ANCHO_HEATMAP, height = ALTO_HEATMAP + 1.5, units = "in", res = 300)
 grid.newpage()
 pushViewport(viewport(layout = grid.layout(2, 2,
@@ -417,10 +417,10 @@ p_go_panel <- ggplot(go_panel, aes(x = FoldEnrichment, y = Description,
                                     size = Count, fill = p.adjust, shape = Direccion)) +
   geom_point(color = "grey20", stroke = 0.3) +
   facet_wrap(~ Modelo, scales = "free_y") +
-  scale_shape_manual(values = c(Up = 24, Down = 25), name = "Dirección",
-                      labels = c(Up = "Sobreexpresado", Down = "Reprimido")) +
+  scale_shape_manual(values = c(Up = 24, Down = 25), name = "Direction",
+                      labels = c(Up = "Upregulated", Down = "Downregulated")) +
   scale_fill_gradient(low = COLOR_KEGG_SIG, high = COLOR_KEGG_NOSIG, trans = "log10",
-                       name = "p ajustado", guide = guide_colorbar(reverse = TRUE)) +
+                       name = "adjusted p-value", guide = guide_colorbar(reverse = TRUE)) +
   scale_size_continuous(range = c(3, 10), name = "Genes",
                          guide = guide_legend(override.aes = list(shape = 24, fill = "grey40"))) +
   labs(
@@ -547,9 +547,9 @@ p_driver_dot <- ggplot(driver_traj, aes(x = Sample, y = 1,
   scale_color_gradientn(colors = GRADIENTE_RNA) +
   scale_size_continuous(range = c(1, 12)) +
   labs(
-    title = "Fusiones RET + gen especifico -- evolución Untreated -> Treated -> Resistant",
-    subtitle = "Izquierda: RET1 (CCDC6--RET, FN1)  |  Derecha: RET2 (KIF5B--RET, MYH9)",
-    x = NULL, y = NULL, color = "FFPM", size = "Lecturas\nde unión"
+    title = "RET fusions + specific gene -- evolution Untreated -> Treated -> Resistant",
+    subtitle = "Left: RET1 (CCDC6--RET, FN1)  |  Right: RET2 (KIF5B--RET, MYH9)",
+    x = NULL, y = NULL, color = "FFPM", size = "Junction\nreads"
   ) +
   theme_minimal(base_size = 12) +
   theme(
@@ -584,7 +584,7 @@ cat("7. Generating combined figure (LFC heatmaps + GO/KEGG + RET + specific gene
 
 ANCHO_FIG_COMBINADA <- 2 * ANCHO_HEATMAP  # same as the width of the combined LFC heatmap (section 4)
 
-out_png_combinado <- file.path(OUT_DIR, "figures", "RET_09_fig2_panel_combinado.png")
+out_png_combinado <- file.path(OUT_DIR, "figures", "RET_09_fig2_panel_combined.png")
 png(out_png_combinado, width = ANCHO_FIG_COMBINADA, height = ALTO_HEATMAP + 1.5 + ALTO_GO_PANEL + ALTO_FUSION_DOT, units = "in", res = 300)
 grid.newpage()
 pushViewport(viewport(layout = grid.layout(4, 2,

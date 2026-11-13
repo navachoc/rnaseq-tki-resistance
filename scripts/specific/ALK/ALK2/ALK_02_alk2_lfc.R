@@ -316,7 +316,7 @@ if (length(classified_idx) >= 2) {
 
 # (b) Cancer/resistance genes (alk_resistance_core, fixed curated list)
 cat("  (b) Cancer/resistance panel (alk_resistance_core)...\n")
-plot_heatmap_genes(alk_resistance_core, "02_heatmap_cancer_resistencia.png",
+plot_heatmap_genes(alk_resistance_core, "02_heatmap_cancer_resistance.png",
                     "alk_resistance_core")
 
 # (c) Genes of the curated WES panel (wes_panel_alk, same SNV/CNV/LOH panel)
@@ -325,7 +325,7 @@ plot_heatmap_genes(alk_resistance_core, "02_heatmap_cancer_resistencia.png",
 #     ALK_03_alk2_key_genes.R, together with the rest of the cross-reference with wes_panel_alk.
 cat("  (c) Full curated WES panel (wes_panel_alk)...\n")
 plot_heatmap_genes(wes_panel_alk, "02_heatmap_wes_panel.png",
-                    "WES curated panel (wes_panel_alk) — completo")
+                    "WES curated panel (wes_panel_alk) — full")
 
 cat("Tables ready for ALK_03_alk2_key_genes.R and ALK_04_alk2_pathways.R.\n\n")
 
@@ -349,33 +349,33 @@ top10_down <- lfc_table %>%
 
 report_text <- paste0(
   "# LFC Report — ", OUT_PREFIX, "\n\n",
-  "**Threshold:** |LFC| ≥ ", LOGFC_THRESHOLD, " sobre LFC_Res_vs_Trt (Resistente vs su parental Treated)\n\n",
-  "## Clasificación\n",
-  "| Clase | N | % |\n",
+  "**Threshold:** |LFC| ≥ ", LOGFC_THRESHOLD, " on LFC_Res_vs_Trt (Resistant vs its Treated parental)\n\n",
+  "## Classification\n",
+  "| Class | N | % |\n",
   "|-------|---|---|\n",
   "| Upregulated | ", n_up, " | ", round(100*n_up/nrow(lfc_table),1), "% |\n",
   "| Downregulated | ", n_down, " | ", round(100*n_down/nrow(lfc_table),1), "% |\n",
   "| Other | ", n_other, " | ", round(100*n_other/nrow(lfc_table),1), "% |\n\n",
   "**Ratio Upregulated/Downregulated:** ", ratio, "\n\n",
-  "**Ya elevados en Treated** (|LFC_Trt_vs_Unt| >= ", LOGFC_THRESHOLD, ", columna `Ya_Elevado_en_Treated`, informativa, ",
-  "no forma parte de la clasificación): ", sum(ya_elevado_trt), " genes\n\n",
-  "## Top 10 Upregulated (por LFC_Res_vs_Trt)\n",
+  "**Already elevated in Treated** (|LFC_Trt_vs_Unt| >= ", LOGFC_THRESHOLD, ", column `Ya_Elevado_en_Treated`, informative, ",
+  "is not part of the classification): ", sum(ya_elevado_trt), " genes\n\n",
+  "## Top 10 Upregulated (by LFC_Res_vs_Trt)\n",
   paste(capture.output(print(as.data.frame(top10_up), row.names = FALSE)), collapse = "\n"), "\n\n",
-  "## Top 10 Downregulated (por LFC_Res_vs_Trt)\n",
+  "## Top 10 Downregulated (by LFC_Res_vs_Trt)\n",
   paste(capture.output(print(as.data.frame(top10_down), row.names = FALSE)), collapse = "\n"), "\n\n",
-  "## Genes forzados en todas las figuras\n",
-  "- ", paste(FORCED_GENES, collapse = ", "), " (fusión driver EML4-ALK) — siempre incluidos ",
-  "en el scatter y en los 3 heatmaps, pasen o no el filtro de LFC\n\n",
-  "## Figuras\n",
+  "## Genes forced in all figures\n",
+  "- ", paste(FORCED_GENES, collapse = ", "), " (EML4-ALK driver fusion) — always included ",
+  "in the scatter and in the 3 heatmaps, whether or not they pass the LFC filter\n\n",
+  "## Figures\n",
   "- 02_lfc_scatter.png (MA plot: Mean_Expr_Trt vs LFC_Res_vs_Trt, Upregulated + Downregulated + ",
   paste(FORCED_GENES, collapse = "/"),
-  " forzados; etiquetados: top15 Up + top15 Down + alk_resistance_core + forzados)\n",
-  "- 02_heatmap_top50.png (25 Up + 25 Down por LFC + ", paste(FORCED_GENES, collapse = "/"),
-  "; gradiente negro-gris-dorado)\n",
-  "- 02_heatmap_cancer_resistencia.png (alk_resistance_core, lista curada fija, panel completo)\n",
-  "- 02_heatmap_wes_panel.png (wes_panel_alk, panel completo)\n",
-  "- Nota: el heatmap del panel WES FILTRADO (solo genes que pasan |LFC|>=threshold) ",
-  "se genera en ALK_03_alk2_key_genes.R, junto al resto del cruce con wes_panel_alk\n"
+  " forced; labelled: top15 Up + top15 Down + alk_resistance_core + forced)\n",
+  "- 02_heatmap_top50.png (25 Up + 25 Down by LFC + ", paste(FORCED_GENES, collapse = "/"),
+  "; black-grey-gold gradient)\n",
+  "- 02_heatmap_cancer_resistance.png (alk_resistance_core, fixed curated list, full panel)\n",
+  "- 02_heatmap_wes_panel.png (wes_panel_alk, full panel)\n",
+  "- Note: the FILTERED WES panel heatmap (only genes passing |LFC|>=threshold) ",
+  "is generated in ALK_03_alk2_key_genes.R, together with the rest of the wes_panel_alk overlap\n"
 )
 writeLines(report_text, file.path(RESULTS_DIR, "report", "02_lfc_report.md"))
 cat("Report: report/02_lfc_report.md\n\n")
