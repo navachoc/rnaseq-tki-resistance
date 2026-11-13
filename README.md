@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src=".github/assets/banner.svg" alt="rnaseq-tki_resistance: bulk RNA-seq pipeline for drug resistance studies" width="960">
+<img src=".github/assets/banner.svg" alt="rnaseq-tki-resistance: bulk RNA-seq pipeline for drug resistance studies" width="960">
 
 # Bulk RNA-seq — TKI Resistance Transcriptomics in NSCLC
 
@@ -83,7 +83,7 @@ Count matrices and metadata come from patient-derived models and are not version
 ## Repository structure
 
 ```
-rnaseq-tki_resistance/
+rnaseq-tki-resistance/
 ├── config/                 # colors.R · gene_lists.R
 ├── data/                   # counts, metadata, fusion calls — not versioned
 ├── scripts/
