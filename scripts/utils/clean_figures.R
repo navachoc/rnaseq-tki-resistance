@@ -16,7 +16,7 @@
 #   Samples are renamed "<RECEPTOR>-<n> <R|P>": receptor, a running number
 #   (parental samples first) and R (resistant) or P (parental). Datasets are
 #   named "<RECEPTOR>_<k>". The key between anonymous labels and real sample
-#   names is written to results/clean/_label_key.csv and must not be published.
+#   names is written to results/_label_key.csv and must not be published.
 #
 # Method: same as the per-target figure scripts. For the PCA, genes starting
 #   with "ENSG" or containing "." are dropped, the 500 most variable genes are
@@ -32,7 +32,7 @@
 #   results/<RECEPTOR>/<MODEL>/tables/01_metadata_unit.csv
 #   results/<RECEPTOR>/<MODEL>/tables/02_lfc_master_table.csv   (MA plot only)
 #   results/<RECEPTOR>/<MODEL>/tables/<RECEPTOR>_resistance_signature_conservative.csv
-# Outputs: results/clean/
+# Outputs: results/
 #
 # Run: source(here::here("scripts/utils/clean_figures.R"))
 #   or Rscript from any folder inside the repository.
@@ -47,7 +47,7 @@ suppressPackageStartupMessages({
   library(grid)
 })
 
-OUT_DIR <- here::here("results", "clean")
+OUT_DIR <- here::here("results")
 dir.create(OUT_DIR, recursive = TRUE, showWarnings = FALSE)
 
 COLOR_CONDITION <- c(Parental = "#e6a817", Resistant = "#013c58")
