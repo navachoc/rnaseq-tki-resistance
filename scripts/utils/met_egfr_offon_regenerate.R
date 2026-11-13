@@ -132,11 +132,16 @@ build_offon_signature <- function(cfg) {
 
   counts <- read.csv(cfg$counts_file, sep = detect_sep(cfg$counts_file), check.names = FALSE)
 
+  # Count-matrix columns are named by Sample; the parental is configured by Model
+  meta_unit    <- read.csv(file.path(cfg$results_dir, "tables", "01_metadata_unit.csv"),
+                           check.names = FALSE)
+  parental_col <- meta_unit$Sample[meta_unit[[1]] == cfg$parental_col]
+
   candidatos <- sig_full %>%
     filter(Classification == "Upregulated", Mean_Expr_Par <= -5, Mean_Expr_Res > OFFON_RES_THRESHOLD) %>%
-    inner_join(counts[, c("gene_name", cfg$parental_col)], by = c("Gene" = "gene_name")) %>%
-    filter(.data[[cfg$parental_col]] == 0) %>%
-    dplyr::select(-all_of(cfg$parental_col))
+    inner_join(counts[, c("gene_name", parental_col)], by = c("Gene" = "gene_name")) %>%
+    filter(.data[[parental_col]] == 0) %>%
+    dplyr::select(-all_of(parental_col))
 
   cat("  off->on genes found:", nrow(candidatos), "\n")
   if (nrow(candidatos) > 0) cat("  ", paste(candidatos$Gene, collapse = ", "), "\n")

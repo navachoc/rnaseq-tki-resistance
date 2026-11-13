@@ -475,7 +475,10 @@ if (DATASET %in% TWO_CLASS_DATASETS) {
 writeLines(report_text, file.path(RESULTS_DIR, "report", "02_lfc_report.md"))
 cat("Report: report/02_lfc_report.md\n\n")
 
-if (requireNamespace("rmarkdown", quietly = TRUE)) {
+HAVE_REPORT <- requireNamespace("rmarkdown", quietly = TRUE) && rmarkdown::pandoc_available()
+if (!HAVE_REPORT) cat("rmarkdown or pandoc not available: skipping the HTML report
+")
+if (HAVE_REPORT) {
   cat("Generating HTML report...\n")
   rmarkdown::render(here::here("scripts", "simple", "rna_02_lfc_report.Rmd"),
                     output_dir  = file.path(RESULTS_DIR, "report"),

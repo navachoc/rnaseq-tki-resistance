@@ -208,7 +208,7 @@ if (!is.null(res_up$go)) {
   tryCatch({
     p_cnet <- cnetplot(res_up$go,
                        showCategory  = 5,
-                       color_gene    = "steelblue",
+                       color_item    = "steelblue",
                        color_category = classification_colors["Upregulated"]) +
       labs(title = paste("Gene-concept network —", up_label, "—", OUT_PREFIX)) +
       theme(plot.title = element_text(face = "bold"),
@@ -225,7 +225,7 @@ if (!is.null(res_down$go)) {
   tryCatch({
     p_cnet_dn <- cnetplot(res_down$go,
                           showCategory   = 5,
-                          color_gene     = "steelblue",
+                          color_item     = "steelblue",
                           color_category = classification_colors["Downregulated"]) +
       labs(title = paste("Gene-concept network — Downregulated —", OUT_PREFIX)) +
       theme(plot.title = element_text(face = "bold"),

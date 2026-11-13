@@ -318,7 +318,10 @@ cat("  3. 01_heatmap_top", TOP_N_HEATMAP, ".png  — Clear expression patterns?\
 
 cat("Report: report/01_qc_report.md\n\n")
 
-if (requireNamespace("rmarkdown", quietly = TRUE)) {
+HAVE_REPORT <- requireNamespace("rmarkdown", quietly = TRUE) && rmarkdown::pandoc_available()
+if (!HAVE_REPORT) cat("rmarkdown or pandoc not available: skipping the HTML report
+")
+if (HAVE_REPORT) {
   cat("Generating HTML report...\n")
   rmarkdown::render(here::here("scripts", "simple", "rna_01_qc_report.Rmd"),
                     output_dir  = file.path(RESULTS_DIR, "report"),

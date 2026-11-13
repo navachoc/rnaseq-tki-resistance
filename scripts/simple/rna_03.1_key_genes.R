@@ -240,10 +240,13 @@ if (DATASET %in% TWO_CLASS_DATASETS) {
     sep_counts <- if (grepl(";", readLines(counts_file, n = 1))) ";" else ","
     counts_raw <- read.csv(counts_file, sep = sep_counts, check.names = FALSE)
 
+    # Count-matrix columns are named by Sample, the parental by Model
+    parental_col <- metadata_unit[parental, "Sample"]
+
     off_on_genes <- up_genes %>%
       filter(Mean_Expr_Par <= -5, Mean_Expr_Res > 2) %>%
-      inner_join(counts_raw[, c("gene_name", parental)], by = c("Gene" = "gene_name")) %>%
-      filter(.data[[parental]] == 0) %>%
+      inner_join(counts_raw[, c("gene_name", parental_col)], by = c("Gene" = "gene_name")) %>%
+      filter(.data[[parental_col]] == 0) %>%
       pull(Gene)
 
     if (length(off_on_genes) > 0) {
@@ -856,7 +859,10 @@ if (DATASET %in% TWO_CLASS_DATASETS) {
 writeLines(report_text, file.path(RESULTS_DIR, "report", "03_key_genes_report.md"))
 cat("  Report: report/03_key_genes_report.md\n\n")
 
-if (requireNamespace("rmarkdown", quietly = TRUE)) {
+HAVE_REPORT <- requireNamespace("rmarkdown", quietly = TRUE) && rmarkdown::pandoc_available()
+if (!HAVE_REPORT) cat("rmarkdown or pandoc not available: skipping the HTML report
+")
+if (HAVE_REPORT) {
   cat("Generating HTML report...\n")
   rmarkdown::render(here::here("scripts", "simple", "rna_03_key_genes_report.Rmd"),
                     output_dir  = file.path(RESULTS_DIR, "report"),

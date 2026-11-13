@@ -201,7 +201,7 @@ run_pathways_drug <- function(drug) {
   cat("4. Network — cnetplot (GO BP,", drug, ")...\n")
   if (!is.null(res_up$go)) {
     tryCatch({
-      p_cnet <- cnetplot(res_up$go, showCategory = 5, color_gene = "steelblue",
+      p_cnet <- cnetplot(res_up$go, showCategory = 5, color_item = "steelblue",
                          color_category = classification_colors["Upregulated"]) +
         labs(title = paste("Gene-concept network —", up_label, "—", drug, "—", OUT_PREFIX)) +
         theme(plot.title = element_text(face = "bold"), plot.background = element_rect(fill = "white"))
@@ -213,7 +213,7 @@ run_pathways_drug <- function(drug) {
 
   if (!is.null(res_down$go)) {
     tryCatch({
-      p_cnet_dn <- cnetplot(res_down$go, showCategory = 5, color_gene = "steelblue",
+      p_cnet_dn <- cnetplot(res_down$go, showCategory = 5, color_item = "steelblue",
                             color_category = classification_colors["Downregulated"]) +
         labs(title = paste("Gene-concept network — Downregulated —", drug, "—", OUT_PREFIX)) +
         theme(plot.title = element_text(face = "bold"), plot.background = element_rect(fill = "white"))

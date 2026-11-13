@@ -315,7 +315,7 @@ if (!is.null(res_up$go)) {
   tryCatch({
     p_cnet <- cnetplot(res_up$go,
                        showCategory  = 5,
-                       color_gene    = "steelblue",
+                       color_item    = "steelblue",
                        color_category = classification_colors["Upregulated"]) +
       labs(title = paste("Gene-concept network — Upregulated —", OUT_PREFIX)) +
       theme(plot.title = element_text(face = "bold"),
@@ -332,7 +332,7 @@ if (!is.null(res_down$go)) {
   tryCatch({
     p_cnet_dn <- cnetplot(res_down$go,
                           showCategory   = 5,
-                          color_gene     = "steelblue",
+                          color_item     = "steelblue",
                           color_category = classification_colors["Downregulated"]) +
       labs(title = paste("Gene-concept network — Downregulated —", OUT_PREFIX)) +
       theme(plot.title = element_text(face = "bold"),
@@ -426,7 +426,10 @@ report_text <- paste0(
 writeLines(report_text, file.path(RESULTS_DIR, "report", "04_pathways_report.md"))
 cat("Report: report/04_pathways_report.md\n\n")
 
-if (requireNamespace("rmarkdown", quietly = TRUE)) {
+HAVE_REPORT <- requireNamespace("rmarkdown", quietly = TRUE) && rmarkdown::pandoc_available()
+if (!HAVE_REPORT) cat("rmarkdown or pandoc not available: skipping the HTML report
+")
+if (HAVE_REPORT) {
   cat("Generating HTML report...\n")
   rmarkdown::render(here::here("scripts", "simple", "rna_04_pathways_report.Rmd"),
                     output_dir  = file.path(RESULTS_DIR, "report"),
