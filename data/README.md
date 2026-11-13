@@ -29,6 +29,9 @@ Raw, **unnormalized** gene-level counts. One row per gene, one column per sample
 | one column per sample | Integer counts |
 
 Sample column names must match the `Sample` column of the metadata file. The separator (`;` or `,`) is detected automatically.
+The scripts rename the matrix columns from `Sample` to `Model`, so the two columns can differ. The separator (`;` or `,`) is detected automatically and can differ between the count and metadata files.
+
+For the RET scripts, `Cell_Line` must be exactly `RET1` or `RET2` and `Model` values must be unique across both datasets.
 
 ## Sample sheets: `metadata_<DATASET>.csv`
 

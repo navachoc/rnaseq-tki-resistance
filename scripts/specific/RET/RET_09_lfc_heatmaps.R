@@ -155,15 +155,15 @@ GENES_FORZADOS <- list(
 calcular_lfc_1v1 <- function(modelo) {
   mat  <- MATS[[modelo]]
   meta <- METAS[[modelo]]
-  untreated_sample <- meta$Sample[meta$Condition == "Parental" & meta$Treatment == "No"]
+  untreated_sample <- meta$Model[meta$Condition == "Parental" & meta$Treatment == "No"]
   # Displayed columns: acutely treated parental(s) + resistant lines. The
   # UNTREATED parental is never a column (its LFC against itself would be 0 in
   # all rows, same criterion as ALK).
-  cols_meta <- meta[meta$Sample != untreated_sample, ]
+  cols_meta <- meta[meta$Model != untreated_sample, ]
   u   <- mat[, untreated_sample]
-  lfc <- sapply(cols_meta$Sample, function(s) mat[, s] - u)
+  lfc <- sapply(cols_meta$Model, function(s) mat[, s] - u)
   rownames(lfc) <- rownames(mat)
-  colnames(lfc) <- cols_meta$Sample
+  colnames(lfc) <- cols_meta$Model
   list(lfc = lfc, cols_meta = cols_meta)
 }
 
@@ -173,7 +173,7 @@ LFC_MATS  <- list(RET1 = res_ret1$lfc, RET2 = res_ret2$lfc)
 COLS_META <- list(RET1 = res_ret1$cols_meta, RET2 = res_ret2$cols_meta)
 
 seleccionar_top_lfc <- function(lfc_mat, cols_meta, forzados = character(0), n_up = TOP_N_LFC, n_down = TOP_N_LFC) {
-  cols_resistentes <- cols_meta$Sample[cols_meta$Condition == "Resistance"]
+  cols_resistentes <- cols_meta$Model[cols_meta$Condition == "Resistance"]
   lfc_res  <- lfc_mat[, cols_resistentes, drop = FALSE]
   genes_ok <- rownames(lfc_res)[!es_ensg_puro(rownames(lfc_res))]
   # Forced genes are removed from the ranking pool (they must not compete or
@@ -209,7 +209,7 @@ cat("3. Generating individual LFC heatmaps...\n")
 construir_heatmap_modelo <- function(modelo, lfc_mat, cols_meta, top_lfc, mostrar_leyenda = TRUE) {
   mat_final <- lfc_mat[top_lfc, , drop = FALSE]
 
-  idx_meta      <- match(colnames(mat_final), cols_meta$Sample)
+  idx_meta      <- match(colnames(mat_final), cols_meta$Model)
   col_modelo    <- setNames(rep(modelo, ncol(mat_final)), colnames(mat_final))
   col_condicion <- setNames(ifelse(cols_meta$Condition[idx_meta] == "Resistance", "Resistant", "Parental"), colnames(mat_final))
   col_drug      <- setNames(cols_meta$Drug[idx_meta], colnames(mat_final))
@@ -217,7 +217,7 @@ construir_heatmap_modelo <- function(modelo, lfc_mat, cols_meta, top_lfc, mostra
   # prefix (e.g. "RET1_BR1" -> "BR1"); acutely treated parentals
   # ("RET1_B250" -> "Treated_BLU667", according to Drug).
   etiqueta_col <- sub(paste0("^", modelo, "_"), "", colnames(mat_final))
-  etiqueta_col <- ifelse(col_condicion == "Parental", paste0("Treated_", col_drug), etiqueta_col)
+  etiqueta_col <- unname(ifelse(col_condicion == "Parental", paste0("Treated_", col_drug), etiqueta_col))
   colnames(mat_final) <- etiqueta_col
   names(col_modelo) <- names(col_condicion) <- names(col_drug) <- etiqueta_col
 

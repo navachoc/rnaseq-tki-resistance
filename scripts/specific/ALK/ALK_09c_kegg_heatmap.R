@@ -497,7 +497,7 @@ leer_counts_crudos <- function(counts_file, cell_line = NULL) {
   meta_file <- sub("counts_", "metadata_", counts_file)
   sep <- if (grepl(";", readLines(counts_file, n = 1))) ";" else ","
   counts   <- read.csv(counts_file, sep = sep, check.names = FALSE)
-  metadata <- read.csv(meta_file,   sep = sep)
+  metadata <- read.csv(meta_file,   sep = if (grepl(";", readLines(meta_file, n = 1))) ";" else ",")
   rownames(counts) <- make.names(counts[, 2], unique = TRUE)
   counts <- counts[, -c(1:3)]
   sample_to_model <- setNames(metadata$Model, metadata$Sample)

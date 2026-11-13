@@ -74,7 +74,7 @@ genes_validos <- function(mat) {
 }
 
 seleccionar_top_z <- function(mat, meta, top_n) {
-  cols <- meta$Sample[meta$Sample %in% colnames(mat)]
+  cols <- meta$Model[meta$Model %in% colnames(mat)]
   genes_ok   <- intersect(genes_validos(mat), rownames(mat))
   mat_modelo <- mat[genes_ok, cols, drop = FALSE]
 
@@ -82,7 +82,7 @@ seleccionar_top_z <- function(mat, meta, top_n) {
   genes_top <- names(sort(var_g, decreasing = TRUE))[1:min(top_n, length(var_g))]
   mat_z     <- t(scale(t(mat_modelo[genes_top, , drop = FALSE])))
 
-  list(mat_z = mat_z, meta_ord = meta[match(colnames(mat_z), meta$Sample), ],
+  list(mat_z = mat_z, meta_ord = meta[match(colnames(mat_z), meta$Model), ],
        n_genes = length(genes_top))
 }
 

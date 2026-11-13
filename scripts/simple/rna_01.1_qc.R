@@ -285,7 +285,7 @@ write.csv(qc_stats, file.path(RESULTS_DIR, "tables", "01_qc_stats.csv"), row.nam
 cat("Tables saved: 01_mat_tmm.csv | 01_metadata_unit.csv | 01_qc_stats.csv\n\n")
 
 # REPORT --------------------------------------------------------------------
-core_list     <- if (DATASET == "MET1_METi") met_resistance_core else alk_resistance_core
+core_list     <- if (DATASET == "MET1_METi") met_resistance_core else if (RECEPTOR == "RET") ret_resistance_core else alk_resistance_core
 core_in_top_heatmap <- intersect(rownames(mat)[top_idx], core_list)
 
 sink(file.path(RESULTS_DIR, "report", "01_qc_report.md"))

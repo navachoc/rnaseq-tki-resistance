@@ -41,7 +41,7 @@ library(pheatmap)
 library(dplyr)
 
 # CURATED WES/scDNA/SNV PANEL: embedded object, no external CSV --------------
-# Model: RET1 | RET2 | Ambos.
+# Model: RET1 | RET2 | Both.
 ret_wes_gene_panel <- data.frame(
   Gene = c("EGFR", "MAP2K1", "MAP2K1", "PTEN", "PTEN", "RET", "PIK3CA",
            "STK11", "ALK", "TP53", "KRAS", "KRAS", "CDKN2A", "NRAS",

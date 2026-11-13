@@ -135,7 +135,7 @@ cat("2. Generating individual heatmaps (top", TOP_N_VARIANZA, "most variable per
 # could select a slightly different gene set and make PCA and heatmap not
 # comparable).
 seleccionar_top_z <- function(mat, meta, top_n) {
-  cols <- meta$Sample
+  cols <- meta$Model
   cols <- cols[cols %in% colnames(mat)]
   genes_ok   <- intersect(genes_validos(mat), rownames(mat))
   mat_modelo <- mat[genes_ok, cols, drop = FALSE]
@@ -145,7 +145,7 @@ seleccionar_top_z <- function(mat, meta, top_n) {
   mat_top   <- mat_modelo[genes_top, , drop = FALSE]
   mat_z     <- t(scale(t(mat_top)))  # per-gene (row) Z-score on TMM
 
-  meta_ord <- meta[match(colnames(mat_z), meta$Sample), ]
+  meta_ord <- meta[match(colnames(mat_z), meta$Model), ]
   list(mat_z = mat_z, meta_ord = meta_ord, n_genes = length(genes_top))
 }
 

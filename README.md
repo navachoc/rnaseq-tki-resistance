@@ -77,6 +77,7 @@ source(here::here("scripts/simple/rna_01.1_qc.R"))
 ```
 
 Count matrices and metadata come from patient-derived models and are not versioned (see `.gitignore`). Shared palettes and reference gene sets live in `config/`.
+**Requirements and status.** KEGG enrichment queries the KEGG web service, so it needs an internet connection. `pandoc` is optional: without it the scripts skip the HTML reports and still write the tables, figures and Markdown reports. `STRINGdb` is optional too. The scripts were run end to end on simulated data in November 2026 (MET, EGFR, RET and ALK). Two curated checks need real data: `MET_01_summary_figures.R` and `RET_09_lfc_heatmaps.R` require specific GO terms to be significant, which simulated data may not satisfy.
 
 ---
 

@@ -37,3 +37,7 @@ The line with two drugs processes both drugs together in each script.
 - `ALK_09c` also needs `results/ALK/combined/tables/ALK_09c_kegg_top5_final.csv`, a curated ranking of KEGG pathways. It is supplied by hand and no script in this repository generates it, so this figure cannot be rebuilt from scratch.
 - The gene lists forced into the heatmaps of `ALK_09c` and `ALK_12` are curated by hand and defined at the top of each script.
 - Output file names keep the numbering of the figures they were first made for (`fig1_`, `fig2_`, `fig3_`).
+- The combined scripts need the outputs of **all three** lines first, including `ALK_resistance_signature_conservative.csv` from step 03.
+- `ALK_09c_kegg_top5_final.csv` needs the columns `Facet`, `Direction`, `Description` and `Modes_sig` (for example `vs_untreated+vs_treated+combined`).
+- The model names in the metadata are matched literally by the combined scripts (`ALK_09`, `ALK_11`, `ALK_12`): `ALK1_L1`–`L3`, `ALK2_L1`–`L5` and, for the line with two drugs, `ALK3`, `ALK3_L`, `ALK3_A`, `ALK3_L2`/`L3`/`L7`/`L9`/`L10` and `ALK3_A2`–`A4`. `ALK3` is taken as the untreated parental and the drug is read from the `_A` suffix.
+- Fusion files are named by `Sample`, not by `Model`.
