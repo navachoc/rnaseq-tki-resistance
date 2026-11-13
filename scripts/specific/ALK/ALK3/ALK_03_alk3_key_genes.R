@@ -7,7 +7,7 @@
 #   The input table (02_lfc_master_table.csv) is long (1 row per
 #   gene x drug); the signature keeps the Drug column to know in which arm
 #   (Lorlatinib/Alectinib) each gene originated. 2-class scheme (see
-#   ALK_02_alk3_lfc.R); Ya_Elevado_en_Treated is kept as informative
+#   ALK_02_alk3_lfc.R); Already_High_in_Treated is kept as informative
 #   data, not as a separate class.
 # Inputs (results/ALK/ALK3/tables/): 01_mat_tmm.csv, 01_metadata_unit.csv,
 #   02_lfc_master_table.csv; config/colors.R, config/gene_lists.R
@@ -157,7 +157,7 @@ if (nrow(forced_df) > 0) {
 
 write.csv(
   signature %>% filter(In_wes_panel_alk) %>%
-    dplyr::select(Gene, Drug, Classification, LFC_Res_vs_Trt, LFC_Res_vs_Unt, LFC_Trt_vs_Unt, Ya_Elevado_en_Treated),
+    dplyr::select(Gene, Drug, Classification, LFC_Res_vs_Trt, LFC_Res_vs_Unt, LFC_Trt_vs_Unt, Already_High_in_Treated),
   file.path(RESULTS_DIR, "tables", paste0(sig_prefix, "_signature_wes_panel_overlap.csv")),
   row.names = FALSE
 )
@@ -170,7 +170,7 @@ write.csv(signature,
 cat("  →", paste0(sig_prefix, "_resistance_signature.csv"), "(", nrow(signature), "gene x drug rows: ",
     sum(signature$Classification == "Upregulated"), "up /",
     sum(signature$Classification == "Downregulated"), "down, ",
-    sum(signature$Ya_Elevado_en_Treated), "already elevated in Treated)\n")
+    sum(signature$Already_High_in_Treated), "already elevated in Treated)\n")
 
 # Conservative: expressed above noise in the untreated parental (baseline)
 signature_cons <- signature %>% filter(Mean_Expr_Unt > -5)
@@ -392,7 +392,7 @@ report_text <- paste0(
   "## Top 15 Upregulated (both drugs, ordered by LFC)\n",
   paste(capture.output(print(
     as.data.frame(up_genes %>% slice_head(n = 15) %>%
-                    dplyr::select(Gene, Drug, LFC_Res_vs_Trt, Ya_Elevado_en_Treated)),
+                    dplyr::select(Gene, Drug, LFC_Res_vs_Trt, Already_High_in_Treated)),
     row.names = FALSE)), collapse = "\n"), "\n\n",
   "## alk_resistance_core detected\n",
   "- Upregulated:  ", paste(unique(core_up),   collapse = ", "), "\n",

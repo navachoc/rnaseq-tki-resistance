@@ -381,7 +381,7 @@ go_panel <- bind_rows(lapply(MODELOS, function(modelo) {
       stop("Curated pathway ", curada$ID[i], " (", modelo, "/", curada$Direccion[i], "/", curada$Fuente[i],
            ") does not appear exactly once in its ORA table; check RUTAS_GO_CURADAS.")
     }
-    fila$Modelo    <- modelo
+    fila$Model    <- modelo
     fila$Direccion <- curada$Direccion[i]
     fila$Fuente    <- curada$Fuente[i]
     fila
@@ -390,16 +390,16 @@ go_panel <- bind_rows(lapply(MODELOS, function(modelo) {
 
 go_panel <- go_panel %>%
   mutate(
-    Modelo    = factor(Modelo, levels = MODELOS),
+    Model    = factor(Model, levels = MODELOS),
     Direccion = factor(Direccion, levels = c("Up", "Down"))
   ) %>%
-  arrange(Modelo, desc(FoldEnrichment)) %>%
+  arrange(Model, desc(FoldEnrichment)) %>%
   mutate(Description = factor(Description, levels = rev(unique(Description))))
 
 write.csv(go_panel, file.path(OUT_DIR, "tables", "RET_09_fig2_go_enrichment.csv"), row.names = FALSE)
 
-cat("   GO pathways -- RET1:", paste(go_panel$Description[go_panel$Modelo == "RET1"], collapse = " | "),
-    "\n   RET2:", paste(go_panel$Description[go_panel$Modelo == "RET2"], collapse = " | "), "\n\n")
+cat("   GO pathways -- RET1:", paste(go_panel$Description[go_panel$Model == "RET1"], collapse = " | "),
+    "\n   RET2:", paste(go_panel$Description[go_panel$Model == "RET2"], collapse = " | "), "\n\n")
 
 # Dotplot, same style as ALK_09c_kegg_heatmap.R and the KEGG
 # enrichment of the EGFR figures: upward triangle (pch 24) =
@@ -416,7 +416,7 @@ COLOR_KEGG_NOSIG <- "#4393C3"  # least significant (steel blue); same hex as ALK
 p_go_panel <- ggplot(go_panel, aes(x = FoldEnrichment, y = Description,
                                     size = Count, fill = p.adjust, shape = Direccion)) +
   geom_point(color = "grey20", stroke = 0.3) +
-  facet_wrap(~ Modelo, scales = "free_y") +
+  facet_wrap(~ Model, scales = "free_y") +
   scale_shape_manual(values = c(Up = 24, Down = 25), name = "Direction",
                       labels = c(Up = "Upregulated", Down = "Downregulated")) +
   scale_fill_gradient(low = COLOR_KEGG_SIG, high = COLOR_KEGG_NOSIG, trans = "log10",

@@ -159,9 +159,9 @@ lfc_per_line <- lapply(resistant, function(li) {
     Gene           = rownames(mat_res),
     Model          = li,
     Drug           = metadata_unit[li, "Drug"],
-    LFC_vs_otras   = lfc,
+    LFC_vs_others   = lfc,
     Mean_Expr_Li   = expr_li,
-    Mean_Expr_Otras = expr_otras,
+    Mean_Expr_Others = expr_otras,
     Classification = classify_lfc(lfc, LOGFC_THRESHOLD)
   )
 }) %>% bind_rows()
@@ -180,7 +180,7 @@ distinctive <- lfc_per_line %>%
   group_by(Gene) %>%
   filter(n() == 1) %>%
   ungroup() %>%
-  arrange(Model, desc(abs(LFC_vs_otras)))
+  arrange(Model, desc(abs(LFC_vs_others)))
 
 write.csv(distinctive, file.path(RESULTS_DIR, "tables", "05_distinctive_genes_per_line.csv"), row.names = FALSE)
 cat("  Distinctive genes of a single line (not shared):", nrow(distinctive), "\n")

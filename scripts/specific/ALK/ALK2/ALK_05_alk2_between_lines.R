@@ -150,9 +150,9 @@ lfc_per_line <- lapply(resistant, function(li) {
   tibble::tibble(
     Gene           = rownames(mat_res),
     Model          = li,
-    LFC_vs_otras   = lfc,
+    LFC_vs_others   = lfc,
     Mean_Expr_Li   = expr_li,
-    Mean_Expr_Otras = expr_otras,
+    Mean_Expr_Others = expr_otras,
     Classification = classify_lfc(lfc, LOGFC_THRESHOLD)
   )
 }) %>% bind_rows()
@@ -171,7 +171,7 @@ distinctive <- lfc_per_line %>%
   group_by(Gene) %>%
   filter(n() == 1) %>%
   ungroup() %>%
-  arrange(Model, desc(abs(LFC_vs_otras)))
+  arrange(Model, desc(abs(LFC_vs_others)))
 
 write.csv(distinctive, file.path(RESULTS_DIR, "tables", "05_distinctive_genes_per_line.csv"), row.names = FALSE)
 cat("  Distinctive genes of a single line (not shared):", nrow(distinctive), "\n")
@@ -273,9 +273,9 @@ lfc_grupo <- expr_A - expr_B
 
 grupo_table <- tibble::tibble(
   Gene              = rownames(mat_res),
-  Mean_Expr_Desplazado    = expr_A,
+  Mean_Expr_Shifted    = expr_A,
   Mean_Expr_SinDesplazar  = expr_B,
-  LFC_Desplazado_vs_SinDesplazar = lfc_grupo,
+  LFC_Shifted_vs_Unshifted = lfc_grupo,
   Classification    = classify_lfc(lfc_grupo, LOGFC_THRESHOLD)
 )
 write.csv(grupo_table, file.path(RESULTS_DIR, "tables", "05_lfc_ic50_group.csv"), row.names = FALSE)
@@ -286,8 +286,8 @@ for (cls in names(tab_grupo)) cat("    ", cls, ":", tab_grupo[cls], "\n")
 cat("\n")
 
 # Cross-reference with curated panels
-grupo_up   <- grupo_table %>% filter(Classification == "Upregulated")   %>% arrange(desc(LFC_Desplazado_vs_SinDesplazar))
-grupo_down <- grupo_table %>% filter(Classification == "Downregulated") %>% arrange(LFC_Desplazado_vs_SinDesplazar)
+grupo_up   <- grupo_table %>% filter(Classification == "Upregulated")   %>% arrange(desc(LFC_Shifted_vs_Unshifted))
+grupo_down <- grupo_table %>% filter(Classification == "Downregulated") %>% arrange(LFC_Shifted_vs_Unshifted)
 
 grupo_core_up   <- intersect(grupo_up$Gene,   alk_resistance_core)
 grupo_core_down <- intersect(grupo_down$Gene, alk_resistance_core)

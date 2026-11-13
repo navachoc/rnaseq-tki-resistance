@@ -48,7 +48,7 @@ GRADIENTE_RNA <- c("#000000", "#808080", "#f2a900")
 
 # Shared between Panel A and Panel B -- both start from a table with
 # Sample/Model/Condition/Drug and need the same Stage (Untreated/Treated/
-# Resistant), Etiqueta (short name for the X axis) and Faceta (ALK3 is split
+# Resistant), Label (short name for the X axis) and Facet (ALK3 is split
 # by drug, the others are not).
 derivar_stage_etiqueta_faceta <- function(df) {
   # substring()/nchar() vectorise element by element; sub(pattern=Model,...)
@@ -62,8 +62,8 @@ derivar_stage_etiqueta_faceta <- function(df) {
         Condition == "Parental"                   ~ "Treated",
         TRUE                                       ~ "Resistant"
       ),
-      Etiqueta = if_else(Stage == "Resistant", substring(Sample, nchar(Model) + 2), Stage),
-      Faceta   = if_else(Model == "ALK3", paste0("ALK3 - ", Drug), Model)
+      Label = if_else(Stage == "Resistant", substring(Sample, nchar(Model) + 2), Stage),
+      Facet   = if_else(Model == "ALK3", paste0("ALK3 - ", Drug), Model)
     )
 }
 
@@ -112,15 +112,15 @@ traj <- traj %>% derivar_stage_etiqueta_faceta()
 # facet (ALK3 is split by drug), a single global order is enough.
 niveles_resistentes <- traj %>%
   filter(Stage == "Resistant") %>%
-  pull(Etiqueta) %>%
+  pull(Label) %>%
   unique()
 niveles_resistentes <- niveles_resistentes[order(as.numeric(sub(".*?(\\d+)$", "\\1", niveles_resistentes)))]
 niveles <- c("Untreated", "Treated", niveles_resistentes)
 
 traj <- traj %>%
   mutate(
-    Etiqueta = factor(Etiqueta, levels = niveles),
-    Faceta   = factor(Faceta, levels = c("ALK1", "ALK2", "ALK3 - Lorlatinib", "ALK3 - Alectinib"))
+    Label = factor(Label, levels = niveles),
+    Facet   = factor(Facet, levels = c("ALK1", "ALK2", "ALK3 - Lorlatinib", "ALK3 - Alectinib"))
   )
 
 out_csv_fusion <- file.path(OUT_DIR, "tables", "ALK_10_fig3_panelA_fusion_dotplot.csv")
@@ -133,7 +133,7 @@ cat("2. Generating Panel A (EML4-ALK fusion dotplot) — 3 variants to compare..
 # the 4 panels with the same default width (nrow=1). More compact, but
 # the global colour scale is dominated by the highest peak (ALK2/ALK3 ~2.3-2.6)
 # and squashes ALK1 (range 0-0.7) almost entirely to black.
-p_fusion_facet <- ggplot(traj, aes(x = Etiqueta, y = 1, size = JunctionReadCount, color = FFPM)) +
+p_fusion_facet <- ggplot(traj, aes(x = Label, y = 1, size = JunctionReadCount, color = FFPM)) +
   geom_point() +
   # Same expansion as scale_x_discrete() of Panel B (expand=0.25) -- without
   # this each plot uses the default ggplot expansion (different), which
@@ -141,7 +141,7 @@ p_fusion_facet <- ggplot(traj, aes(x = Etiqueta, y = 1, size = JunctionReadCount
   # vertical gridlines of A and B would not coincide when stacked in the
   # combined A+B, even if the boxes already have the same width (patchwork).
   scale_x_discrete(expand = expansion(mult = 0.25)) +
-  facet_wrap(~ Faceta, scales = "free_x", nrow = 1) +
+  facet_wrap(~ Facet, scales = "free_x", nrow = 1) +
   scale_color_gradientn(colors = GRADIENTE_RNA) +
   scale_size_continuous(range = c(1, 12)) +
   labs(
@@ -175,7 +175,7 @@ cat("  ", out_png_facet, "\n")
 # better differentiates its own changes (like the individual figures of
 # each model), at the cost of repeating the legend 4 times.
 plot_panel_fusion <- function(df_sub, titulo) {
-  ggplot(df_sub, aes(x = Etiqueta, y = 1, size = JunctionReadCount, color = FFPM)) +
+  ggplot(df_sub, aes(x = Label, y = 1, size = JunctionReadCount, color = FFPM)) +
     geom_point() +
     scale_color_gradientn(colors = GRADIENTE_RNA) +
     scale_size_continuous(range = c(1, 12)) +
@@ -192,9 +192,9 @@ plot_panel_fusion <- function(df_sub, titulo) {
     )
 }
 
-facetas <- levels(traj$Faceta)
-n_cols  <- sapply(facetas, function(f) length(unique(traj$Etiqueta[traj$Faceta == f])))
-paneles <- lapply(facetas, function(f) plot_panel_fusion(traj %>% filter(Faceta == f), f))
+facetas <- levels(traj$Facet)
+n_cols  <- sapply(facetas, function(f) length(unique(traj$Label[traj$Facet == f])))
+paneles <- lapply(facetas, function(f) plot_panel_fusion(traj %>% filter(Facet == f), f))
 
 p_fusion_patchwork <- wrap_plots(paneles, nrow = 1) +
   plot_layout(widths = n_cols) +
@@ -218,11 +218,11 @@ cat("  ", out_png_patchwork, "\n\n")
 # Variant C -- same base as Variant A (facet_wrap, a single legend,
 # global colour scale) but with the FFPM and Junction reads values
 # as text under each point, for direct reading without relying on colour.
-p_fusion_facet_valores <- ggplot(traj, aes(x = Etiqueta, y = 1, size = JunctionReadCount, color = FFPM)) +
+p_fusion_facet_valores <- ggplot(traj, aes(x = Label, y = 1, size = JunctionReadCount, color = FFPM)) +
   geom_point() +
   geom_text(aes(label = paste0("FFPM ", sprintf("%.2f", FFPM), "\nn=", JunctionReadCount)),
             y = 0.8, size = 2.5, color = "grey20", lineheight = 0.85) +
-  facet_wrap(~ Faceta, scales = "free_x", nrow = 1) +
+  facet_wrap(~ Facet, scales = "free_x", nrow = 1) +
   scale_color_gradientn(colors = GRADIENTE_RNA) +
   scale_size_continuous(range = c(1, 12)) +
   coord_cartesian(ylim = c(0.6, 1.15), clip = "off") +
@@ -299,15 +299,15 @@ COLOR_DERECHA   <- "#D86ECC"
 # colours as Panel D.
 cat("4. Generating Panel B (ALK/EML4 expression, horizontal striplot)...\n")
 
-panel_b_puntos <- bind_rows(lapply(levels(traj$Faceta), function(f) {
-  base   <- traj %>% filter(Faceta == f) %>% distinct(Sample, Model, Faceta, Etiqueta, Stage)
+panel_b_puntos <- bind_rows(lapply(levels(traj$Facet), function(f) {
+  base   <- traj %>% filter(Facet == f) %>% distinct(Sample, Model, Facet, Label, Stage)
   modelo <- unique(base$Model)
   bind_rows(
-    base %>% mutate(LFC = lfc_untreated("EML4", modelo, Sample), Gen = "EML4", Posicion = "Left"),
-    base %>% mutate(LFC = lfc_untreated("ALK",  modelo, Sample), Gen = "ALK",  Posicion = "Right")
+    base %>% mutate(LFC = lfc_untreated("EML4", modelo, Sample), Gene_Symbol = "EML4", Position = "Left"),
+    base %>% mutate(LFC = lfc_untreated("ALK",  modelo, Sample), Gene_Symbol = "ALK",  Position = "Right")
   )
 })) %>%
-  mutate(Faceta = factor(Faceta, levels = levels(traj$Faceta)))
+  mutate(Facet = factor(Facet, levels = levels(traj$Facet)))
 
 out_csv_panel_b <- file.path(OUT_DIR, "tables", "ALK_10_fig3_panelB_alk_eml4_expression.csv")
 write.csv(panel_b_puntos, out_csv_panel_b, row.names = FALSE)
@@ -322,12 +322,12 @@ cat("  ", out_csv_panel_b, "\n\n")
 # falls outside, without visual warning), and the real LFC of ALK in ALK1_L1 is -3.03.
 rango_panel_b  <- range(panel_b_puntos$LFC, na.rm = TRUE)
 margen_panel_b <- diff(rango_panel_b) * 0.08
-p_panel_b <- ggplot(panel_b_puntos, aes(x = Etiqueta, y = LFC, color = Posicion)) +
+p_panel_b <- ggplot(panel_b_puntos, aes(x = Label, y = LFC, color = Position)) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "grey60") +
   geom_point(size = 2.8) +
   scale_x_discrete(expand = expansion(mult = 0.25)) +
   scale_y_continuous(limits = rango_panel_b + c(-margen_panel_b, margen_panel_b)) +
-  facet_wrap(~ Faceta, scales = "free_x", nrow = 1) +
+  facet_wrap(~ Facet, scales = "free_x", nrow = 1) +
   # breaks set explicitly -- without this, scale_color_manual orders the
   # levels alphabetically (Right before Left) but matches
   # "labels" by POSITION according to the order written in the code
@@ -363,7 +363,7 @@ cat("  ", out_png_panel_b, "\n\n")
 # inches -- the legend of A (right) and that of B (bottom), plus the fact that
 # A has no Y axis text and B does, shift the panel area differently in each
 # ggsave(). patchwork aligns the panel grid automatically when stacking 2
-# ggplots that share the same facet variable (Faceta, same order in
+# ggplots that share the same facet variable (Facet, same order in
 # both) -- the only reliable way for the boxes of ALK1/ALK2/ALK3-Lorlatinib/
 # ALK3-Alectinib to coincide in width between A and B.
 cat("4.1. Generating combined Panel A+B (aligned boxes)...\n")
@@ -442,10 +442,10 @@ todas_fusiones <- bind_rows(
   derivar_stage_etiqueta_faceta()
 
 muestras_por_faceta <- todas_fusiones %>%
-  distinct(Sample, Model, Condition, Drug, Stage, Etiqueta, Faceta) %>%
+  distinct(Sample, Model, Condition, Drug, Stage, Label, Facet) %>%
   mutate(
-    Etiqueta = factor(Etiqueta, levels = niveles),
-    Faceta   = factor(Faceta, levels = levels(traj$Faceta))
+    Label = factor(Label, levels = niveles),
+    Facet   = factor(Facet, levels = levels(traj$Facet))
   )
 
 # Fusion selected per facet -- see the criterion in the script header.
@@ -453,7 +453,7 @@ muestras_por_faceta <- todas_fusiones %>%
 # order as LeftGeneSymbol/RightGeneSymbol of STAR-Fusion) -- it is the
 # criterion that sets the colour in Panel D (left=#FFC000, right=#D86ECC).
 FUSIONES_LLAMATIVAS <- data.frame(
-  Faceta          = c("ALK1", "ALK2", "ALK3 - Alectinib", "ALK3 - Lorlatinib"),
+  Facet          = c("ALK1", "ALK2", "ALK3 - Alectinib", "ALK3 - Lorlatinib"),
   FusionName      = c("ENSG00000306786--MBNL2", "ARHGAP5--AKAP6", "LUC7L3--CACNA1G", "DTX2--ZP3"),
   Etiqueta_fusion = c("MBNL2", "ARHGAP5-AKAP6", "LUC7L3-CACNA1G", "DTX2-ZP3"),
   GenLeft         = c(NA, "ARHGAP5", "LUC7L3", "DTX2"),
@@ -462,9 +462,9 @@ FUSIONES_LLAMATIVAS <- data.frame(
 )
 
 construir_trayectoria_fusion <- function(fusion_name, faceta_obj, etiqueta_fusion) {
-  base <- muestras_por_faceta %>% filter(Faceta == faceta_obj)
+  base <- muestras_por_faceta %>% filter(Facet == faceta_obj)
   datos_fusion <- todas_fusiones %>%
-    filter(`#FusionName` == fusion_name, Faceta == faceta_obj) %>%
+    filter(`#FusionName` == fusion_name, Facet == faceta_obj) %>%
     select(Sample, FFPM, JunctionReadCount)
   base %>%
     left_join(datos_fusion, by = "Sample") %>%
@@ -477,12 +477,12 @@ construir_trayectoria_fusion <- function(fusion_name, faceta_obj, etiqueta_fusio
 
 panel_c_lista <- lapply(seq_len(nrow(FUSIONES_LLAMATIVAS)), function(i) {
   fila <- FUSIONES_LLAMATIVAS[i, ]
-  construir_trayectoria_fusion(fila$FusionName, fila$Faceta, fila$Etiqueta_fusion)
+  construir_trayectoria_fusion(fila$FusionName, fila$Facet, fila$Etiqueta_fusion)
 })
 panel_c_datos <- bind_rows(panel_c_lista) %>%
   mutate(
-    Etiqueta     = factor(Etiqueta, levels = niveles),
-    Fusion_Label = factor(Fusion_Label, levels = paste0(FUSIONES_LLAMATIVAS$Faceta, " — ", FUSIONES_LLAMATIVAS$Etiqueta_fusion))
+    Label     = factor(Label, levels = niveles),
+    Fusion_Label = factor(Fusion_Label, levels = paste0(FUSIONES_LLAMATIVAS$Facet, " — ", FUSIONES_LLAMATIVAS$Etiqueta_fusion))
   )
 
 out_csv_panel_c <- file.path(OUT_DIR, "tables", "ALK_10_fig3_panelC_striking_fusions.csv")
@@ -508,20 +508,20 @@ cat("6. Generating Panel C (striking fusions heatmap)...\n")
 # that both figures read aligned row by row (same position of each
 # fusion).
 columnas_c <- muestras_por_faceta %>%
-  mutate(Faceta = factor(Faceta, levels = levels(traj$Faceta)), Etiqueta = factor(Etiqueta, levels = niveles)) %>%
-  arrange(Faceta, Etiqueta)
-col_keys <- paste(columnas_c$Faceta, columnas_c$Etiqueta, sep = " | ")
-row_keys <- paste0(FUSIONES_LLAMATIVAS$Faceta, ": ", FUSIONES_LLAMATIVAS$Etiqueta_fusion)
+  mutate(Facet = factor(Facet, levels = levels(traj$Facet)), Label = factor(Label, levels = niveles)) %>%
+  arrange(Facet, Label)
+col_keys <- paste(columnas_c$Facet, columnas_c$Label, sep = " | ")
+row_keys <- paste0(FUSIONES_LLAMATIVAS$Facet, ": ", FUSIONES_LLAMATIVAS$Etiqueta_fusion)
 
 mat_fusion_c <- matrix(NA_real_, nrow = length(row_keys), ncol = length(col_keys),
                         dimnames = list(row_keys, col_keys))
 
 for (i in seq_len(nrow(FUSIONES_LLAMATIVAS))) {
   fila       <- FUSIONES_LLAMATIVAS[i, ]
-  fusion_lbl <- paste0(fila$Faceta, " — ", fila$Etiqueta_fusion)
+  fusion_lbl <- paste0(fila$Facet, " — ", fila$Etiqueta_fusion)
   datos_fila <- panel_c_datos %>% filter(Fusion_Label == fusion_lbl)
   for (j in seq_len(nrow(datos_fila))) {
-    ck <- paste(datos_fila$Faceta[j], datos_fila$Etiqueta[j], sep = " | ")
+    ck <- paste(datos_fila$Facet[j], datos_fila$Label[j], sep = " | ")
     mat_fusion_c[i, ck] <- datos_fila$FFPM[j]
   }
 }
@@ -538,8 +538,8 @@ COL_FUN_C <- colorRamp2(c(0, 0.5, 1), GRADIENTE_RNA)
 # columns -- transpose of the previous matrix.
 mat_fusion_c_t      <- t(mat_fusion_c)
 mat_fusion_c_norm_t <- t(mat_fusion_c_norm)
-faceta_por_fila_c    <- factor(columnas_c$Faceta, levels = levels(traj$Faceta))
-etiqueta_por_fila_c  <- as.character(columnas_c$Etiqueta)
+faceta_por_fila_c    <- factor(columnas_c$Facet, levels = levels(traj$Facet))
+etiqueta_por_fila_c  <- as.character(columnas_c$Label)
 
 ht_panel_c <- Heatmap(
   mat_fusion_c_norm_t,
@@ -613,40 +613,40 @@ cat("7. Generating Panel D (expression of the Panel C genes)...\n")
 
 panel_d_puntos <- bind_rows(lapply(seq_len(nrow(FUSIONES_LLAMATIVAS)), function(i) {
   fila       <- FUSIONES_LLAMATIVAS[i, ]
-  faceta_obj <- fila$Faceta
-  base       <- muestras_por_faceta %>% filter(Faceta == faceta_obj)
+  faceta_obj <- fila$Facet
+  base       <- muestras_por_faceta %>% filter(Facet == faceta_obj)
   modelo     <- unique(base$Model)
 
   genes_pos <- list(Left = fila$GenLeft, Right = fila$GenRight)
   bind_rows(lapply(names(genes_pos), function(pos) {
     g <- genes_pos[[pos]]
     if (is.na(g)) return(NULL)
-    base %>% mutate(LFC = lfc_untreated(g, modelo, Sample), Gen = g, Posicion = pos)
+    base %>% mutate(LFC = lfc_untreated(g, modelo, Sample), Gene_Symbol = g, Position = pos)
   }))
 })) %>%
   mutate(
-    Faceta   = factor(Faceta, levels = levels(traj$Faceta)),
-    Etiqueta = factor(Etiqueta, levels = niveles)
+    Facet   = factor(Facet, levels = levels(traj$Facet)),
+    Label = factor(Label, levels = niveles)
   )
 
 out_csv_panel_d <- file.path(OUT_DIR, "tables", "ALK_10_fig3_panelD_striking_fusion_genes.csv")
 write.csv(panel_d_puntos, out_csv_panel_d, row.names = FALSE)
 cat("  ", out_csv_panel_d, "\n\n")
 
-# hjust by Posicion -- the left gene is labelled to the left of the
+# hjust by Position -- the left gene is labelled to the left of the
 # point, the right one to the right, so they diverge instead of
 # overlapping when the 2 genes of a fusion fall at a similar LFC.
 # scales="free" (not just free_y) -- the 4 fusions have very different LFC
 # ranges (MBNL2 ~1 vs CACNA1G ~5.5), a shared X axis would leave little
 # room for the labels of the lower-magnitude facets (they would be cut off).
-p_panel_d <- ggplot(panel_d_puntos, aes(x = LFC, y = Etiqueta, color = Posicion)) +
+p_panel_d <- ggplot(panel_d_puntos, aes(x = LFC, y = Label, color = Position)) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey70") +
   geom_point(size = 2.8) +
-  geom_text(aes(label = Gen, hjust = if_else(Posicion == "Left", 1.2, -0.2)),
+  geom_text(aes(label = Gene_Symbol, hjust = if_else(Position == "Left", 1.2, -0.2)),
             color = "black", fontface = "bold", size = 2.6, show.legend = FALSE) +
   scale_x_continuous(expand = expansion(mult = 0.4)) +
   scale_y_discrete(limits = rev) +
-  facet_grid(Faceta ~ ., scales = "free", space = "free_y") +
+  facet_grid(Facet ~ ., scales = "free", space = "free_y") +
   # breaks set explicitly -- same reason as in Panel B, see the
   # comment there.
   scale_color_manual(breaks = c("Left", "Right"),

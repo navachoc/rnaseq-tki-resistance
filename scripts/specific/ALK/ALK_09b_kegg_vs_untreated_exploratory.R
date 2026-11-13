@@ -176,9 +176,9 @@ correr_analisis <- function(tipo, modo, run_fun) {
 
     bind_rows(
       if (!is.null(res_up))   res_up   %>% arrange(p.adjust) %>% slice_head(n = TOP_N) %>%
-        transmute(Faceta = f, Direction = "Upregulated", Description, p.adjust, Count, FoldEnrichment) else NULL,
+        transmute(Facet = f, Direction = "Upregulated", Description, p.adjust, Count, FoldEnrichment) else NULL,
       if (!is.null(res_down)) res_down %>% arrange(p.adjust) %>% slice_head(n = TOP_N) %>%
-        transmute(Faceta = f, Direction = "Downregulated", Description, p.adjust, Count, FoldEnrichment) else NULL
+        transmute(Facet = f, Direction = "Downregulated", Description, p.adjust, Count, FoldEnrichment) else NULL
     )
   }))
 }
@@ -190,7 +190,7 @@ generar_figura <- function(top_df, tipo, modo, titulo_tipo) {
   }
   top_df <- top_df %>%
     mutate(
-      Faceta    = factor(Faceta, levels = names(FACETAS)),
+      Facet    = factor(Facet, levels = names(FACETAS)),
       Direction = factor(Direction, levels = c("Upregulated", "Downregulated"))
     )
 
@@ -198,9 +198,9 @@ generar_figura <- function(top_df, tipo, modo, titulo_tipo) {
   write.csv(top_df, out_csv, row.names = FALSE)
   cat("  ", out_csv, "\n")
 
-  facetas_con_datos <- names(FACETAS)[names(FACETAS) %in% unique(top_df$Faceta)]
+  facetas_con_datos <- names(FACETAS)[names(FACETAS) %in% unique(top_df$Facet)]
   paneles <- lapply(facetas_con_datos, function(f) {
-    plot_panel(top_df %>% filter(Faceta == f), as.character(f))
+    plot_panel(top_df %>% filter(Facet == f), as.character(f))
   })
 
   p <- wrap_plots(paneles, ncol = 2) +

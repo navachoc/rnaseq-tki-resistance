@@ -5,7 +5,7 @@
 #   alk_resistance_core and with the curated WES panel (wes_panel_alk).
 #   Dedicated per-model version, derived from scripts/simple/rna_03.1_key_genes.R.
 #   2-class scheme (see ALK_02_alk1_lfc.R). The signature keeps the column
-#   Ya_Elevado_en_Treated (inherited from the master table) as informative
+#   Already_High_in_Treated (inherited from the master table) as informative
 #   data, not as a separate class. ALK and EML4 (driver fusion) are forced
 #   into the signature and the figures.
 # Inputs (results/ALK/ALK1/tables/): 01_mat_tmm.csv, 01_metadata_unit.csv,
@@ -144,7 +144,7 @@ if (nrow(forced_df) > 0) {
 
 write.csv(
   signature %>% filter(In_wes_panel_alk) %>%
-    dplyr::select(Gene, Classification, LFC_Res_vs_Trt, LFC_Res_vs_Unt, LFC_Trt_vs_Unt, Ya_Elevado_en_Treated),
+    dplyr::select(Gene, Classification, LFC_Res_vs_Trt, LFC_Res_vs_Unt, LFC_Trt_vs_Unt, Already_High_in_Treated),
   file.path(RESULTS_DIR, "tables", paste0(sig_prefix, "_signature_wes_panel_overlap.csv")),
   row.names = FALSE
 )
@@ -157,7 +157,7 @@ write.csv(signature,
 cat("  →", paste0(sig_prefix, "_resistance_signature.csv"), "(", nrow(signature), "genes: ",
     sum(signature$Classification == "Upregulated"), "up /",
     sum(signature$Classification == "Downregulated"), "down, ",
-    sum(signature$Ya_Elevado_en_Treated), "already elevated in Treated)\n")
+    sum(signature$Already_High_in_Treated), "already elevated in Treated)\n")
 
 # Conservative: expressed above noise in the untreated parental (baseline)
 signature_cons <- signature %>% filter(Mean_Expr_Unt > -5)
@@ -370,11 +370,11 @@ cat("7. Generating report...\n")
 report_text <- paste0(
   "# Key Genes Report — ", OUT_PREFIX, "\n\n",
   "**Signature:** data-driven (no known gene list) — Upregulated + Downregulated ",
-  "(Ya_Elevado_en_Treated is kept as an informative column, not as a class)\n\n",
+  "(Already_High_in_Treated is kept as an informative column, not as a class)\n\n",
   "## Top 15 Upregulated\n",
   paste(capture.output(print(
     as.data.frame(slice_head(up_genes, n = 15) %>%
-                    dplyr::select(Gene, LFC_Res_vs_Trt, Ya_Elevado_en_Treated)),
+                    dplyr::select(Gene, LFC_Res_vs_Trt, Already_High_in_Treated)),
     row.names = FALSE)), collapse = "\n"), "\n\n",
   "## alk_resistance_core detected\n",
   "- Upregulated:  ", paste(core_up,   collapse = ", "), "\n",
