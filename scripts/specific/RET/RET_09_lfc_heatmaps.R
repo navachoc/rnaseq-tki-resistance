@@ -1,8 +1,8 @@
 # =============================================================================
-# RET_09_figura2_lfc_heatmaps.R
+# RET_09_lfc_heatmaps.R
 #
 # Purpose: differential expression figure for the RET models (RET1, RET2),
-# RET version of the LFC heatmap in ALK_12_figura2_lfc_heatmaps.R. Three blocks:
+# RET version of the LFC heatmap in ALK_12_lfc_heatmaps.R. Three blocks:
 #
 #   1. LFC heatmap per model (sections 1-4). One column per displayed sample
 #      (acutely treated parental + each resistant line), with 1 vs 1 LFC
@@ -60,7 +60,7 @@
 #
 # Usage: paths are resolved with here::here() from the repository root
 # (.here file), so it works from any working directory:
-#   Rscript scripts/specific/RET/RET_09_figura2_lfc_heatmaps.R
+#   Rscript scripts/specific/RET/RET_09_lfc_heatmaps.R
 # =============================================================================
 
 suppressPackageStartupMessages({
@@ -92,7 +92,7 @@ COL_FUN_LFC <- circlize::colorRamp2(c(-LFC_MAX, 0, LFC_MAX), GRADIENTE_RNA)
 
 # =============================================================================
 # 1. Read TMM + metadata per model (LFC heatmap): same files as
-#    RET_08_figura1_heatmaps_individuales.R (01_mat_tmm.csv / 01_metadata_
+#    RET_08_individual_heatmaps.R (01_mat_tmm.csv / 01_metadata_
 #    unit.csv); nothing is reanalyzed.
 # =============================================================================
 cat("1. Reading TMM and metadata per model...\n")
@@ -401,8 +401,8 @@ write.csv(go_panel, file.path(OUT_DIR, "tables", "RET_09_fig2_go_enrichment.csv"
 cat("   GO pathways -- RET1:", paste(go_panel$Description[go_panel$Modelo == "RET1"], collapse = " | "),
     "\n   RET2:", paste(go_panel$Description[go_panel$Modelo == "RET2"], collapse = " | "), "\n\n")
 
-# Dotplot, same style as ALK_09c_figura2_kegg_heatmap.R and the KEGG
-# enrichment of ALK_09_figura3_egfr1_egfri.R: upward triangle (pch 24) =
+# Dotplot, same style as ALK_09c_kegg_heatmap.R and the KEGG
+# enrichment of the EGFR figures: upward triangle (pch 24) =
 # Upregulated, downward triangle (pch 25) = Downregulated; shape encodes
 # direction. Color = p.adjust (terracotta = most significant / steel blue =
 # least significant gradient), NOT direction, so color and shape are not
@@ -614,6 +614,6 @@ upViewport()
 dev.off()
 cat("  ", out_png_combinado, "\n")
 
-cat("\n=== RET_09_figura2_lfc_heatmaps.R finished (2 individual LFC heatmaps + combined + row order CSV + footnote",
+cat("\n=== RET_09_lfc_heatmaps.R finished (2 individual LFC heatmaps + combined + row order CSV + footnote",
     "-- GO BP + KEGG functional enrichment (ggplot) -- RET + specific gene dotplot (ggplot)",
     "-- combined figure) ===\n")

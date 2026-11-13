@@ -1,5 +1,5 @@
 # =============================================================================
-# ALK_09b_kegg_vs_untreated_exploratorio.R
+# ALK_09b_kegg_vs_untreated_exploratory.R
 # Purpose: exploratory script, NOT part of the main pipeline. It does not
 #   modify the outputs of ALK_02/ALK_04/ALK_09; all its files carry their own
 #   prefix/suffix.
@@ -32,7 +32,7 @@
 #   results/ALK/combined/tables/ALK_09b_{kegg,go}_top8_<mode>.csv
 #   Full CSVs (not only top8) per facet/direction/mode in
 #   results/ALK/<model>/tables/04_{kegg,go}_{up,down}regulated_<mode>_<facet>.csv
-# Usage: source(here::here("scripts/specific/ALK/ALK_09b_kegg_vs_untreated_exploratorio.R"))
+# Usage: source(here::here("scripts/specific/ALK/ALK_09b_kegg_vs_untreated_exploratory.R"))
 #   or Rscript from any folder of the repo.
 # =============================================================================
 

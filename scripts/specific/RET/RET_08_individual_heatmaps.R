@@ -1,15 +1,15 @@
 # =============================================================================
-# RET_08_figura1_heatmaps_individuales.R
+# RET_08_individual_heatmaps.R
 #
 # Purpose: PCA and expression heatmap per RET model (RET1, RET2). RET version
-# of ALK_11_figura1_heatmaps_individuales.R with 2 columns instead of 3.
+# of ALK_11_individual_heatmaps.R with 2 columns instead of 3.
 #   - Heatmap: top 500 most variable genes WITHIN each model (TMM),
 #     per-gene Z-score, fixed -2/2 scale in both models.
 #   - PCA: computed on the SAME top 500 Z-score matrix as the heatmap
 #     (seleccionar_top_z()), not on its own top-N, so that both panels are
 #     strictly comparable. Visual design (color = Condition, shape = Inhibitor,
 #     geom_text_repel, panel border) follows the ALK RNA-seq PCA
-#     (ALK_09_figura4_combinada.R).
+#     (ALK_09_combined_figure.R).
 #   - Combined panel: PCA (top row) + heatmap (bottom row), 2 rows x 2 columns.
 # No reanalysis: reads the TMM matrices and metadata produced by
 # rna_01.1_qc.R for RET.
@@ -51,7 +51,7 @@
 #
 # Usage: paths are resolved with here::here() from the repository root
 # (.here file), so it works from any working directory:
-#   Rscript scripts/specific/RET/RET_08_figura1_heatmaps_individuales.R
+#   Rscript scripts/specific/RET/RET_08_individual_heatmaps.R
 # =============================================================================
 
 suppressPackageStartupMessages({
@@ -201,7 +201,7 @@ for (modelo in names(heatmaps)) {
 # 2b. PCA per model, COMPUTED ON THE SAME top 500 Z-score MATRIX used by the
 #     heatmap (seleccionar_top_z(), section 2), instead of its own top-N.
 #     Visual design (color=Condition, shape=Inhibitor, geom_text_repel, bold
-#     panel border) follows the ALK RNA-seq PCA (ALK_09_figura4_combinada.R;
+#     panel border) follows the ALK RNA-seq PCA (ALK_09_combined_figure.R;
 #     ALK_11 has no PCA).
 #
 #     Color = Condition (Parental/Resistente, 2 levels, see Condition3 in
@@ -328,4 +328,4 @@ upViewport()
 dev.off()
 cat("  ", out_combinado, "\n")
 
-cat("\n=== RET_08_figura1_heatmaps_individuales.R finished (4 individual PNGs: 2 PCA + 2 heatmap; + 1 combined PCA+heatmap panel) ===\n")
+cat("\n=== RET_08_individual_heatmaps.R finished (4 individual PNGs: 2 PCA + 2 heatmap; + 1 combined PCA+heatmap panel) ===\n")

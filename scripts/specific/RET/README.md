@@ -16,9 +16,9 @@ Analysis of the RET design: each model has an untreated parental population, a p
 
 | Script | What it does |
 |--------|--------------|
-| `RET_08_figura1_heatmaps_individuales.R` | PCA and heatmap (top 500 most variable genes, z-score) per model, plus a combined panel |
-| `RET_08b_figura25_pca.R` | Same computation with a PCA with and without sample names, and the combined figure |
-| `RET_09_figura2_lfc_heatmaps.R` | LFC heatmaps per model, GO/KEGG dot plot and a dot plot of fusions |
+| `RET_08_individual_heatmaps.R` | PCA and heatmap (top 500 most variable genes, z-score) per model, plus a combined panel |
+| `RET_08b_pca.R` | Same computation with a PCA with and without sample names, and the combined figure |
+| `RET_09_lfc_heatmaps.R` | LFC heatmaps per model, GO/KEGG dot plot and a dot plot of fusions |
 
 ## Run order
 

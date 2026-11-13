@@ -1,8 +1,8 @@
 # =============================================================================
-# ALK_12_figura2_lfc_heatmaps.R
+# ALK_12_lfc_heatmaps.R
 # Purpose: LFC heatmaps per model (ALK1/ALK2/ALK3), 3 individual PNGs
 #   + 1 combined panel (the 3 side by side, quick reference), same format
-#   as ALK_11_figura1_heatmaps_individuales.R. A combined heatmap with the
+#   as ALK_11_individual_heatmaps.R. A combined heatmap with the
 #   3 models as columns would be fragmented (the top-LFC genes of one model
 #   are flat in the other 2).
 #
@@ -55,7 +55,7 @@
 #     expected effect explained in the figure caption.
 #
 # Does NOT reanalyse anything -- reads the same TMM matrices (01_mat_tmm.csv, already in
-# log2) as ALK_09_figura4_combinada.R and ALK_11_figura1_heatmaps_individuales.R.
+# log2) as ALK_09_combined_figure.R and ALK_11_individual_heatmaps.R.
 #
 # Inputs:
 #   results/ALK/ALK1/tables/01_mat_tmm.csv
@@ -72,7 +72,7 @@
 #
 # Labels, axes and legends in English.
 #
-# Usage: source(here::here("scripts/specific/ALK/ALK_12_figura2_lfc_heatmaps.R"))
+# Usage: source(here::here("scripts/specific/ALK/ALK_12_lfc_heatmaps.R"))
 #   or Rscript from any folder of the repo.
 # =============================================================================
 
@@ -97,7 +97,7 @@ COLOR_CATEGORY <- c("Top LFC (Res vs Unt, per line)" = "#2C7FB8",
                      "WES/Receptor panel"             = "#D95F02")
 
 # Condition/Drug annotation above each column -- same palette as
-# ALK_11_figura1_heatmaps_individuales.R (shared colour identity).
+# ALK_11_individual_heatmaps.R (shared colour identity).
 # The untreated parental is not shown; the columns are the treated
 # parental(s) (Condition = "Parental") and the resistant lines
 # (Condition = "Resistant").
@@ -364,7 +364,7 @@ for (modelo in names(resultados)) {
 # =============================================================================
 # 4. Combined panel -- the 3 heatmaps side by side, quick reference
 #    (grid viewports, not patchwork -- ComplexHeatmap is not a ggplot grob,
-#    same mechanism as ALK_11_figura1_heatmaps_individuales.R)
+#    same mechanism as ALK_11_individual_heatmaps.R)
 # =============================================================================
 cat("4. Generating combined panel...\n")
 
@@ -411,4 +411,4 @@ upViewport()
 dev.off()
 cat("  ", out_combinado, "\n")
 
-cat("\n=== ALK_12_figura2_lfc_heatmaps.R completed (3 individual PNGs + 1 combined) ===\n")
+cat("\n=== ALK_12_lfc_heatmaps.R completed (3 individual PNGs + 1 combined) ===\n")

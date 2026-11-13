@@ -1,18 +1,18 @@
 # =============================================================================
-# ALK_09_figura4_combinada.R
+# ALK_09_combined_figure.R
 # Purpose: combined bulk RNA-seq figure of the 3 ALK models.
 #   Panel A: joint clustering heatmap, top 50 most variable genes on the
 #   joint TMM matrix ALK1+ALK2+ALK3, per-gene Z-score.
 #   Panel B-D: PCA per cell line, top 500 most variable genes of each one on
 #   TMM with per-gene Z-score, with and without names, stacked with patchwork.
-#   The combined KEGG + LFC heatmap is in ALK_09c_figura2_kegg_heatmap.R and
-#   the fusions in ALK_10_figura3_fusiones.R.
+#   The combined KEGG + LFC heatmap is in ALK_09c_kegg_heatmap.R and
+#   the fusions in ALK_10_fusions_figure.R.
 # Inputs: results/ALK/{ALK1,ALK2,ALK3}/tables/01_mat_tmm.csv
 # Outputs (results/ALK/combined/figures/):
 #   ALK_09_fig1_panelA_heatmap_variables.png,
 #   ALK_09_fig1_panelBCD_pca_lineas[_sin_nombres].png,
 #   ALK_09_fig1_pca_{ALK1,ALK2,ALK3}[_sin_nombres].png
-# Usage: source(here::here("scripts/specific/ALK/ALK_09_figura4_combinada.R"))
+# Usage: source(here::here("scripts/specific/ALK/ALK_09_combined_figure.R"))
 #   or Rscript from any folder of the repo.
 # =============================================================================
 
@@ -279,4 +279,4 @@ for (m in names(pcas_rna)) {
 }
 cat("\n")
 
-cat("=== ALK_09_figura4_combinada.R — Panel A + B-D completed ===\n")
+cat("=== ALK_09_combined_figure.R — Panel A + B-D completed ===\n")

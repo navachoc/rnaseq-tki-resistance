@@ -14,7 +14,7 @@
 #   tables/08_fusions_shared_models.csv, figures/08_fusions_*.png,
 #   report/08_fusions_report.md
 # Dependencies: none within the pipeline (reads the STAR-Fusion output).
-#   Its table 08_fusions_all_samples.csv is read by RET_09_figura2_lfc_heatmaps.R.
+#   Its table 08_fusions_all_samples.csv is read by RET_09_lfc_heatmaps.R.
 # Usage: paths are resolved with here::here() from the repository root
 # (.here file), so it works from any working directory:
 #   Rscript scripts/specific/RET/rna_08.1_fusions_ret.R

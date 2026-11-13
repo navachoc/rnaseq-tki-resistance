@@ -16,7 +16,7 @@
 #   report/04_pathways_report.md
 # Dependencies (run first): rna_03b.1_key_genes.R for the same CELL_LINE.
 #   One run per model (CELL_LINE = "RET1" | "RET2").
-#   Its 04_* tables are read by RET_09_figura2_lfc_heatmaps.R.
+#   Its 04_* tables are read by RET_09_lfc_heatmaps.R.
 # Usage: paths are resolved with here::here() from the repository root
 # (.here file), so it works from any working directory:
 #   Rscript scripts/specific/RET/rna_04b.1_pathways.R

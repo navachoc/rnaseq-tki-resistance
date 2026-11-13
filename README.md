@@ -93,7 +93,7 @@ rnaseq-tki-resistance/
 │   │   ├── EGFR/
 │   │   ├── MET/
 │   │   └── RET/            # treated-parental design, fusions, combined figures
-│   └── utilidades/         # helpers shared across targets
+│   └── utils/         # helpers shared across targets
 └── results/                # selected figures per target
 ```
 

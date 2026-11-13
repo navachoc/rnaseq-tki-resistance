@@ -34,7 +34,7 @@
 #   results/<RECEPTOR>/<MODEL>/tables/<RECEPTOR>_resistance_signature_conservative.csv
 # Outputs: results/clean/
 #
-# Run: source(here::here("scripts/utilidades/clean_figures.R"))
+# Run: source(here::here("scripts/utils/clean_figures.R"))
 #   or Rscript from any folder inside the repository.
 # =============================================================================
 

@@ -1,5 +1,5 @@
 # =============================================================================
-# ALK_10_figura3_fusiones.R
+# ALK_10_fusions_figure.R
 # Purpose: RNA fusion figure (STAR-Fusion) of the 3 ALK models.
 #   It does not reanalyse the fusions, it starts from the tables of
 #   ALK_08.1_*_fusions.R.
@@ -26,7 +26,7 @@
 #   results/ALK/{ALK1,ALK2,ALK3}/tables/01_mat_tmm.csv
 # Outputs: results/ALK/combined/{figures,tables}/ALK_10_* (PNG of each panel
 #   and variant, aligned A+B PNG, data CSV of each panel)
-# Usage: source(here::here("scripts/specific/ALK/ALK_10_figura3_fusiones.R"))
+# Usage: source(here::here("scripts/specific/ALK/ALK_10_fusions_figure.R"))
 #   or Rscript from any folder of the repo.
 # =============================================================================
 
@@ -254,7 +254,7 @@ cat("  ", out_png_facet_valores, "\n\n")
 
 # =============================================================================
 # COMMON INFRASTRUCTURE B/D -- TMM per individual sample (same pattern as
-# ALK_09_figura4_combinada.R, reloaded here so that the script is
+# ALK_09_combined_figure.R, reloaded here so that the script is
 # independent). Already needed for Panel B (ALK/EML4 expression).
 # =============================================================================
 cat("3. Reading TMM (expression) for Panel B/D...\n")
@@ -275,7 +275,7 @@ tmm_por_modelo <- list(
 # log2FC vs Untreated for a gene, vectorised over the samples of a
 # facet -- 01_mat_tmm.csv is already in log2CPM (see ALK_01_*_qc.R), so
 # the log2FC is a simple subtraction (same criterion as
-# lfc_vs_untreated() in ALK_09_figura4_combinada.R), without undoing the log2.
+# lfc_vs_untreated() in ALK_09_combined_figure.R), without undoing the log2.
 lfc_untreated <- function(gene, modelo, muestras) {
   mat <- tmm_por_modelo[[modelo]]
   if (!gene %in% rownames(mat)) return(rep(NA_real_, length(muestras)))
@@ -674,4 +674,4 @@ out_png_panel_d <- file.path(OUT_DIR, "figures", "ALK_10_fig3_panelD_genes_fusio
 ggsave(out_png_panel_d, p_panel_d, width = 8.5, height = 11, dpi = 300)
 cat("  ", out_png_panel_d, "\n\n")
 
-cat("=== ALK_10_figura3_fusiones.R — Panels A, B (+ aligned A+B), C and D completed ===\n")
+cat("=== ALK_10_fusions_figure.R — Panels A, B (+ aligned A+B), C and D completed ===\n")

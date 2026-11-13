@@ -19,12 +19,12 @@ The line with two drugs processes both drugs together in each script.
 
 | Script | What it does |
 |--------|--------------|
-| `ALK_09_figura4_combinada.R` | PCA per line, and a joint heatmap of the most variable genes |
-| `ALK_09b_kegg_vs_untreated_exploratorio.R` | Exploratory. KEGG and GO with three alternative Up/Down definitions, to compare which pathways each one gives. Writes tables that `ALK_09c` reads |
-| `ALK_09c_figura2_kegg_heatmap.R` | LFC heatmap across lines and KEGG dot plots |
-| `ALK_10_figura3_fusiones.R` | Fusion figure, built from the tables of the `08.1` scripts |
-| `ALK_11_figura1_heatmaps_individuales.R` | One heatmap per line (top 500 most variable genes, z-score) |
-| `ALK_12_figura2_lfc_heatmaps.R` | One LFC heatmap per line against the untreated parental, plus a combined panel |
+| `ALK_09_combined_figure.R` | PCA per line, and a joint heatmap of the most variable genes |
+| `ALK_09b_kegg_vs_untreated_exploratory.R` | Exploratory. KEGG and GO with three alternative Up/Down definitions, to compare which pathways each one gives. Writes tables that `ALK_09c` reads |
+| `ALK_09c_kegg_heatmap.R` | LFC heatmap across lines and KEGG dot plots |
+| `ALK_10_fusions_figure.R` | Fusion figure, built from the tables of the `08.1` scripts |
+| `ALK_11_individual_heatmaps.R` | One heatmap per line (top 500 most variable genes, z-score) |
+| `ALK_12_lfc_heatmaps.R` | One LFC heatmap per line against the untreated parental, plus a combined panel |
 
 ## Run order
 

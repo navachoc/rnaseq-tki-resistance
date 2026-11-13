@@ -1,5 +1,5 @@
 # =============================================================================
-# met_egfr_offon_genes_regenerar.R
+# met_egfr_offon_regenerate.R
 #
 # WARNING: this script writes files with the SAME NAMES as the simple pipeline
 # (scripts/simple/rna_01.1_qc.R ... rna_03.1_key_genes.R / rna_04.1_pathways.R),
@@ -48,7 +48,7 @@
 #   figures/04_kegg_{upregulated,downregulated}.png + tables/*.csv
 #   figures/01_pca_top500.png, figures/02_lfc_scatter.png
 #   (they overwrite the same-named pipeline files; the MET1 04_* tables are
-#   read by scripts/specific/MET/MET_01_figura14.R)
+#   read by scripts/specific/MET/MET_01_summary_figures.R)
 #
 # Dependencies (run first, scripts/simple/): rna_01.1_qc.R,
 # rna_02.1_lfc.R and rna_03.1_key_genes.R with DATASET = "MET1_METi" and
@@ -56,7 +56,7 @@
 #
 # Usage: paths are resolved with here::here() from the repository root
 # (.here file), so it works from any working directory:
-#   Rscript scripts/utilidades/met_egfr_offon_genes_regenerar.R
+#   Rscript scripts/utils/met_egfr_offon_regenerate.R
 # =============================================================================
 
 suppressPackageStartupMessages({
@@ -400,4 +400,4 @@ for (nombre in names(DATASETS)) {
   plot_ma(cfg)
 }
 
-cat("\n=== met_egfr_offon_genes_regenerar.R finished ===\n")
+cat("\n=== met_egfr_offon_regenerate.R finished ===\n")

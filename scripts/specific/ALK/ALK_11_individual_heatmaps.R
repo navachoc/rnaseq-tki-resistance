@@ -1,9 +1,9 @@
 # =============================================================================
-# ALK_11_figura1_heatmaps_individuales.R
+# ALK_11_individual_heatmaps.R
 # Purpose: 3 individual heatmaps per cell model (ALK1/ALK2/ALK3),
 #   top 500 most variable genes of each model, per-gene Z-score in the
 #   colour gradient. Per-model alternative to the joint TMM heatmap of the
-#   23 samples (Panel A of ALK_09_figura4_combinada.R), which is not modified
+#   23 samples (Panel A of ALK_09_combined_figure.R), which is not modified
 #   (ALK_09 still also generates the PCA of Panel B-D).
 #
 # With 500 genes per heatmap it makes no sense for the row names to be
@@ -23,7 +23,7 @@
 # resistant).
 #
 # Does NOT reanalyse anything -- reads the same TMM matrices (01_mat_tmm.csv) as
-# ALK_09_figura4_combinada.R.
+# ALK_09_combined_figure.R.
 #
 # Inputs:
 #   results/ALK/ALK1/tables/01_mat_tmm.csv
@@ -38,7 +38,7 @@
 #
 # Labels, axes and legends in English.
 #
-# Usage: source(here::here("scripts/specific/ALK/ALK_11_figura1_heatmaps_individuales.R"))
+# Usage: source(here::here("scripts/specific/ALK/ALK_11_individual_heatmaps.R"))
 #   or Rscript from any folder of the repo.
 # =============================================================================
 
@@ -52,7 +52,7 @@ suppressPackageStartupMessages({
 OUT_DIR <- here::here("results", "ALK", "combined")
 dir.create(file.path(OUT_DIR, "figures"), recursive = TRUE, showWarnings = FALSE)
 
-# Palette shared by the whole figure -- identical to ALK_09_figura4_combinada.R
+# Palette shared by the whole figure -- identical to ALK_09_combined_figure.R
 # (one gradient colour per technique: black-grey-gold for RNA-seq).
 GRADIENTE_RNA    <- c("#000000", "#808080", "#f2a900")
 COLOR_CONDICION  <- c(Parental = "#e6a817", Resistant = "#013c58")
@@ -91,7 +91,7 @@ tmm_alk1 <- leer_tmm("ALK1")
 tmm_alk2 <- leer_tmm("ALK2")
 tmm_alk3  <- leer_tmm("ALK3")
 
-# Same columns per model as ALK_09_figura4_combinada.R (Untreated +
+# Same columns per model as ALK_09_combined_figure.R (Untreated +
 # Treated + resistant lines).
 cols_alk1  <- c("ALK1", "ALK1_L", "ALK1_L1", "ALK1_L2", "ALK1_L3")
 cols_alk2  <- c("ALK2", "ALK2_L", "ALK2_L1", "ALK2_L2", "ALK2_L3", "ALK2_L4", "ALK2_L5")
@@ -223,4 +223,4 @@ upViewport()
 dev.off()
 cat("  ", out_combinado, "\n")
 
-cat("\n=== ALK_11_figura1_heatmaps_individuales.R completed (3 individual PNGs + 1 combined) ===\n")
+cat("\n=== ALK_11_individual_heatmaps.R completed (3 individual PNGs + 1 combined) ===\n")

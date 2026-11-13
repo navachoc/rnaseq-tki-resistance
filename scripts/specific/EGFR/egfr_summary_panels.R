@@ -1,5 +1,5 @@
 # =============================================================================
-# egfr_figura3_panels.R
+# egfr_summary_panels.R
 #
 # Purpose: EGFR expression panels (EGFR1 parental vs EGFR1_R resistant, bulk
 # RNA-seq). Reads the CSV tables produced by the pipeline scripts (it does not
@@ -35,7 +35,7 @@
 #   text. All genes in the list with an available LFC (no top15/15), standard
 #   orange/blue colours (classification_colors).
 # Panel D — KEGG enrichment (ORA, up/down combined on a single Y axis), same
-#   visual style as ALK_09c_figura2_kegg_heatmap.R: upward triangle (pch 24) =
+#   visual style as ALK_09c_kegg_heatmap.R: upward triangle (pch 24) =
 #   Upregulated, downward triangle (pch 25) = Downregulated, size = Count,
 #   colour = p.adjust (terracotta #D6604D -> steel blue #4393C3 gradient).
 #   Without the ALK "Convergence" column (EGFR1_EGFRi has a single comparator).
@@ -69,7 +69,7 @@
 #
 # Usage: paths are resolved with here::here() from the repository root
 # (.here file), so it works from any working directory:
-#   Rscript scripts/specific/EGFR/egfr_figura3_panels.R
+#   Rscript scripts/specific/EGFR/egfr_summary_panels.R
 # =============================================================================
 
 suppressPackageStartupMessages({
@@ -273,7 +273,7 @@ p_panelB <- ggplot(plot_df,
   geom_hline(yintercept = c(-LOGFC_THRESHOLD, LOGFC_THRESHOLD),
              linetype = "dashed", color = "gray50", linewidth = 0.5) +
   geom_hline(yintercept = 0, color = "black", linewidth = 0.3) +
-  # Names in black bold, like the MET MA plot (MET_01_figura14.R);
+  # Names in black bold, like the MET MA plot (MET_01_summary_figures.R);
   # size 5 so they are legible.
   geom_text_repel(aes(label = label), size = 5, fontface = "bold", color = "black",
                   max.overlaps = Inf, segment.size = 0.2, box.padding = 0.5,
@@ -412,7 +412,7 @@ cat("  ", out_c2, "\n")
 
 # =============================================================================
 # Panel D — KEGG enrichment (up/down), same style as ALK
-# (ALK_09c_figura2_kegg_heatmap.R): upward triangle (pch 24) = Upregulated,
+# (ALK_09c_kegg_heatmap.R): upward triangle (pch 24) = Upregulated,
 # downward triangle (pch 25) = Downregulated, size = Count. As in ALK, colour
 # encodes p.adjust (terracotta -> steel blue gradient) and shape encodes
 # direction; colour and shape are not redundant.
@@ -481,4 +481,4 @@ if (!file.exists(IN_KEGG_UP)) {
   cat("  ", out_d, "\n")
 }
 
-cat("\n=== egfr_figura3_panels.R finished (panels A, B, C, C2, D generated here) ===\n")
+cat("\n=== egfr_summary_panels.R finished (panels A, B, C, C2, D generated here) ===\n")

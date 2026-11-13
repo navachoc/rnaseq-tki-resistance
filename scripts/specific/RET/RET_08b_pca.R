@@ -1,11 +1,11 @@
 # =============================================================================
-# RET_08b_figura25_pca.R
+# RET_08b_pca.R
 #
 # Purpose: RNA-seq PCA of RET1 and RET2 with and without sample names, and a
 # full figure (PCA + heatmaps) using the PCA without names, so that samples
-# can be labelled manually (same approach as MET_01_figura14.R).
+# can be labelled manually (same approach as MET_01_summary_figures.R).
 #
-# The computation is identical to RET_08_figura1_heatmaps_individuales.R: top
+# The computation is identical to RET_08_individual_heatmaps.R: top
 # 500 most variable genes of each model on TMM, per-gene Z-score, prcomp on
 # the samples and a ComplexHeatmap heatmap of the same matrix. Same colors,
 # shapes, legends and layout.
@@ -24,7 +24,7 @@
 #
 # Usage: paths are resolved with here::here() from the repository root
 # (.here file), so it works from any working directory:
-#   Rscript scripts/specific/RET/RET_08b_figura25_pca.R
+#   Rscript scripts/specific/RET/RET_08b_pca.R
 # =============================================================================
 
 suppressPackageStartupMessages({
