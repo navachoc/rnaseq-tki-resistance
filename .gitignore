@@ -1,0 +1,21 @@
+# Data: never versioned (only the format description is tracked)
+data/*
+!data/README.md
+
+# Results: nothing by default; selected figures are added explicitly (git add -f)
+results/**
+
+# Rendered reports
+*.html
+
+# Internal notes and tooling
+CLAUDE.md
+.claude/
+PIPELINE_CHEATSHEET.md
+
+# R / editor
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+.vscode/

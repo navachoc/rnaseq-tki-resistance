@@ -1,0 +1,9 @@
+# Normalize line endings for all text files
+* text=auto
+
+# Force LF for scripts (cross-platform compatibility)
+*.R text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.csv text eol=lf
+*.gitignore text eol=lf
